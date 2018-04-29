@@ -29,7 +29,7 @@ public class AudioSearchController {
     @RequestMapping(method = RequestMethod.GET,
             value = "/search",
             produces = APPLICATION_JSON_VALUE)
-    public Sermon search(@RequestParam("q") String query){
+    public Sermon search(@RequestParam("q") String query, @RequestParam int page, @RequestParam int size){
         final String url = "https://search-faithbibleaudio-test-o7t56t5553l4m33riniuxvw6nq.us-east-1.es.amazonaws.com/audio_data/sermons/_search?";
         final RestTemplate restTemplate = new RestTemplate();
 
@@ -41,18 +41,25 @@ public class AudioSearchController {
     @RequestMapping(method = RequestMethod.GET,
             value = "/search/series",
             produces = APPLICATION_JSON_VALUE)
-    public Iterable<Sermon> searchSeries(@RequestParam("q") String query){
+    public Iterable<Sermon> searchSeries(
+            @RequestParam("q") String query,
+            @RequestParam int page,
+            @RequestParam int size){
 
-        return searchService.findBySeries(query, PageRequest.of(0, 10))
+        return searchService.findBySeries(query, PageRequest.of(page, size))
                 .map(s -> new Sermon(s.getId(), s.getTitle(), s.getSpeaker(), s.getSeries()));
     }
 
     @RequestMapping(method = RequestMethod.GET,
             value = "/search/speaker",
             produces = APPLICATION_JSON_VALUE)
-    public List<Sermon> searchSpeaker(@RequestParam("q") String query){
+    public Iterable<Sermon> searchSpeaker(
+            @RequestParam("q") String query,
+            @RequestParam int page,
+            @RequestParam int size){
 
-        return Collections.emptyList();
+        return searchService.findBySpeaker(query, PageRequest.of(page, size))
+                .map(s -> new Sermon(s.getId(), s.getTitle(), s.getSpeaker(), s.getSeries()));
 
     }
 
