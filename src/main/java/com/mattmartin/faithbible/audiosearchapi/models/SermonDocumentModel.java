@@ -1,9 +1,11 @@
 package com.mattmartin.faithbible.audiosearchapi.models;
 
 
+import org.apache.tomcat.jni.Local;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 
@@ -16,7 +18,7 @@ public class SermonDocumentModel {
     private String title;
     private String href;
     private String speaker;
-    private String date;
+    private LocalDateTime date;
     private String series;
 
     private SermonMediaModel media;
@@ -24,7 +26,7 @@ public class SermonDocumentModel {
     public SermonDocumentModel(){}
 
     public SermonDocumentModel(final String id, final String title, final String href, final String speaker,
-                               final String date, final String series, final SermonMediaModel media) {
+                               final LocalDateTime date, final String series, final SermonMediaModel media) {
         this.id = id;
         this.title = title;
         this.href = href;
@@ -66,11 +68,11 @@ public class SermonDocumentModel {
         this.speaker = speaker;
     }
 
-    public String getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 

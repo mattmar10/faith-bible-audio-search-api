@@ -1,0 +1,19 @@
+spring:
+  profiles:
+    active: "local"
+
+---
+
+spring:
+  profiles: local
+  data:
+    jest:
+      uri: http://localhost:9200
+
+---
+
+spring:
+  profiles: prod
+  data:
+    jest:
+      uri: https://vpc-fbc-test-domain-l5gsjfna2i2676acjakzrihl64.us-east-1.es.amazonaws.com

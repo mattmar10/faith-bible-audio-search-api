@@ -7,5 +7,5 @@
 #spring.datasource.driver-class-name=org.postgresql.Driver
 
 # AWS Domain URL
-spring.data.jest.uri=https://search-faithbibleaudiotest-niw4743vurqxnf6sapnk5prapu.us-east-1.es.amazonaws.com
-spring.data.jest.aws-region=eu-east-1
+spring.data.jest.uri=http://localhost:9200
+#spring.data.jest.aws-region=eu-east-1
