@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,7 +63,7 @@ public class AudioSearchController {
             @RequestParam int page,
             @RequestParam int size){
 
-        return searchService.findBySeries(query, PageRequest.of(page, size))
+        return searchService.findBySeries(query, PageRequest.of(page, size, Sort.Direction.DESC, "date"))
                 .map(s -> new Sermon(s));
     }
 
@@ -79,7 +80,7 @@ public class AudioSearchController {
             @RequestParam int page,
             @RequestParam int size){
 
-        return searchService.findBySpeaker(query, PageRequest.of(page, size))
+        return searchService.findBySpeaker(query, PageRequest.of(page, size, Sort.Direction.DESC, "date"))
                 .map(s -> new Sermon(s));
 
     }
