@@ -2,14 +2,19 @@ package com.mattmartin.faithbible.audiosearchapi.services;
 
 import com.mattmartin.faithbible.audiosearchapi.models.SermonDocumentModel;
 import com.mattmartin.faithbible.audiosearchapi.repositories.SermonRepository;
+import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Optional;
+
+import static org.elasticsearch.index.query.QueryBuilders.multiMatchQuery;
 
 @Service
 public class ESSermonService{
@@ -42,7 +47,21 @@ public class ESSermonService{
         return sermonRepository.findBySeries(series, pageRequest);
     }
 
+    public Optional<SermonDocumentModel>findById(final String id){
+        return sermonRepository.findById(id);
+    }
+
     public Page<SermonDocumentModel> findByFreeSearch(final String query, final PageRequest pageRequest) {
-        return null;
+
+        final SearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(multiMatchQuery(query)
+                        .field("title")
+                        .field("speaker")
+                        .field("series")
+                        .type(MultiMatchQueryBuilder.Type.BEST_FIELDS))
+                .withPageable(pageRequest)
+                .build();
+
+        return sermonRepository.search(searchQuery);
     }
 }

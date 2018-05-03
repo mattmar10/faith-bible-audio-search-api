@@ -9,8 +9,10 @@ import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,28 +29,36 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
-public class AudioSearchController {
+public class SermonSearchController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final ESSermonService searchService;
 
     @Autowired
-    public AudioSearchController(final ESSermonService sService){
+    public SermonSearchController(final ESSermonService sService){
         this.searchService = sService;
     }
 
-//    @RequestMapping(method = RequestMethod.GET,
-//            value = "/search",
-//            produces = APPLICATION_JSON_VALUE)
-//    public ResponseEntity<Sermon> search(@RequestParam("q") String query, @RequestParam int page, @RequestParam int size){
-//        final String url = "https://search-faithbibleaudio-test-o7t56t5553l4m33riniuxvw6nq.us-east-1.es.amazonaws.com/audio_data/sermons/_search?";
-//        final RestTemplate restTemplate = new RestTemplate();
-//
-//        ResponseEntity<String> result = restTemplate.getForEntity(url + "q="+ query, String.class);
-//
-//        return new ResponseEntity<>(new Sermon(), HttpStatus.OK);
-//    }
+    @ResponseStatus(OK)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 400, message = "BAD REQUEST")
+    })
+    @RequestMapping(method = RequestMethod.GET,
+            value = "/search",
+            produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Iterable<Sermon>> search(@RequestParam("q") String query,
+                                                   @RequestParam int page,
+                                                   @RequestParam int size){
+
+        final Page<SermonDocumentModel> found =
+                searchService.findByFreeSearch(query, PageRequest.of(page, size, Sort.Direction.DESC, "date"));
+
+        final Iterable<Sermon> mapped = found.map(sermonDocumentModel -> new Sermon(sermonDocumentModel));
+
+        return new ResponseEntity<Iterable<Sermon>>(mapped, HttpStatus.OK);
+    }
 
     @ResponseStatus(OK)
     @ApiResponses(value = {
@@ -58,13 +68,17 @@ public class AudioSearchController {
     @RequestMapping(method = RequestMethod.GET,
             value = "/search/series",
             produces = APPLICATION_JSON_VALUE)
-    public Iterable<Sermon> searchSeries(
+    public ResponseEntity<Iterable<Sermon>> searchSeries(
             @RequestParam("q") String query,
             @RequestParam int page,
             @RequestParam int size){
 
-        return searchService.findBySeries(query, PageRequest.of(page, size, Sort.Direction.DESC, "date"))
-                .map(s -> new Sermon(s));
+         final Page<SermonDocumentModel> found =
+                 searchService.findBySeries(query, PageRequest.of(page, size, Sort.Direction.DESC, "date"));
+
+        final Iterable<Sermon> mapped = found.map(sermonDocumentModel -> new Sermon(sermonDocumentModel));
+
+        return new ResponseEntity<Iterable<Sermon>>(mapped, HttpStatus.OK);
     }
 
     @ResponseStatus(OK)
@@ -75,14 +89,17 @@ public class AudioSearchController {
     @RequestMapping(method = RequestMethod.GET,
             value = "/search/speaker",
             produces = APPLICATION_JSON_VALUE)
-    public Iterable<Sermon> searchSpeaker(
+    public ResponseEntity<Iterable<Sermon>> searchSpeaker(
             @RequestParam("q") String query,
             @RequestParam int page,
             @RequestParam int size){
 
-        return searchService.findBySpeaker(query, PageRequest.of(page, size, Sort.Direction.DESC, "date"))
-                .map(s -> new Sermon(s));
+        final Page<SermonDocumentModel> found =
+                searchService.findBySpeaker(query, PageRequest.of(page, size, Sort.Direction.DESC, "date"));
 
+        final Iterable<Sermon> mapped = found.map(sermonDocumentModel -> new Sermon(sermonDocumentModel));
+
+        return new ResponseEntity<Iterable<Sermon>>(mapped, HttpStatus.OK);
     }
 
     @ResponseStatus(OK)
