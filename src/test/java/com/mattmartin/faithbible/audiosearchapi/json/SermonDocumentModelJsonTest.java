@@ -51,5 +51,7 @@ public class SermonDocumentModelJsonTest {
                         mediaModel);
 
         assertThat(parsed, equalTo(manual));
+        assertThat(parsed.hashCode(), equalTo(manual.hashCode()));
+        assertThat(parsed.hashCode(), equalTo(manual.hashCode()));
     }
 }

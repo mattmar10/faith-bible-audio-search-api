@@ -1,6 +1,5 @@
 package com.mattmartin.faithbible.audiosearchapi.services;
 
-import com.mattmartin.faithbible.audiosearchapi.dtos.Sermon;
 import com.mattmartin.faithbible.audiosearchapi.models.SermonDocumentModel;
 import com.mattmartin.faithbible.audiosearchapi.repositories.SermonRepository;
 import org.slf4j.Logger;

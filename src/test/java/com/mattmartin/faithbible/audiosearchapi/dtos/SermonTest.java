@@ -62,5 +62,6 @@ public class SermonTest {
         final Sermon sermon2 = new Sermon(manual);
 
         assertThat(sermon, equalTo(sermon2));
+        assertThat(sermon.hashCode(), equalTo(sermon2.hashCode()));
     }
 }
