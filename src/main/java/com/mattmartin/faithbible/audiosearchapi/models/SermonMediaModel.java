@@ -2,30 +2,30 @@ package com.mattmartin.faithbible.audiosearchapi.models;
 
 public class SermonMediaModel {
 
-    private String pdfUrl;
-    private String mp3Url;
+    private String pdf;
+    private String mp3;
 
     SermonMediaModel(){}
 
-    public SermonMediaModel(final String pdfUrl, final String mp3Url){
-        this.pdfUrl = pdfUrl;
-        this.mp3Url = mp3Url;
+    public SermonMediaModel(final String pdf, final String mp3){
+        this.pdf = pdf;
+        this.mp3 = mp3;
     }
 
-    public String getPdfUrl() {
-        return pdfUrl;
+    public String getPdf() {
+        return pdf;
     }
 
-    public void setPdfUrl(String pdfUrl) {
-        this.pdfUrl = pdfUrl;
+    public void setPdf(String pdf) {
+        this.pdf = pdf;
     }
 
-    public String getMp3Url() {
-        return mp3Url;
+    public String getMp3() {
+        return mp3;
     }
 
-    public void setMp3Url(String mp3Url) {
-        this.mp3Url = mp3Url;
+    public void setMp3(String mp3) {
+        this.mp3 = mp3;
     }
 
     @Override
@@ -35,22 +35,22 @@ public class SermonMediaModel {
 
         SermonMediaModel that = (SermonMediaModel) o;
 
-        if (pdfUrl != null ? !pdfUrl.equals(that.pdfUrl) : that.pdfUrl != null) return false;
-        return mp3Url != null ? mp3Url.equals(that.mp3Url) : that.mp3Url == null;
+        if (pdf != null ? !pdf.equals(that.pdf) : that.pdf != null) return false;
+        return mp3 != null ? mp3.equals(that.mp3) : that.mp3 == null;
     }
 
     @Override
     public int hashCode() {
-        int result = pdfUrl != null ? pdfUrl.hashCode() : 0;
-        result = 31 * result + (mp3Url != null ? mp3Url.hashCode() : 0);
+        int result = pdf != null ? pdf.hashCode() : 0;
+        result = 31 * result + (mp3 != null ? mp3.hashCode() : 0);
         return result;
     }
 
     @Override
     public String toString() {
         return "SermonMediaModel{" +
-                "pdfUrl='" + pdfUrl + '\'' +
-                ", mp3Url='" + mp3Url + '\'' +
+                "pdf='" + pdf + '\'' +
+                ", mp3='" + mp3 + '\'' +
                 '}';
     }
 }
