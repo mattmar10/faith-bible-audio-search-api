@@ -37,17 +37,17 @@ public class AudioSearchController {
         this.searchService = sService;
     }
 
-    @RequestMapping(method = RequestMethod.GET,
-            value = "/search",
-            produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Sermon> search(@RequestParam("q") String query, @RequestParam int page, @RequestParam int size){
-        final String url = "https://search-faithbibleaudio-test-o7t56t5553l4m33riniuxvw6nq.us-east-1.es.amazonaws.com/audio_data/sermons/_search?";
-        final RestTemplate restTemplate = new RestTemplate();
-
-        ResponseEntity<String> result = restTemplate.getForEntity(url + "q="+ query, String.class);
-
-        return new ResponseEntity<>(new Sermon("id", "Test Sermon",  "speaker", "series", null), HttpStatus.OK);
-    }
+//    @RequestMapping(method = RequestMethod.GET,
+//            value = "/search",
+//            produces = APPLICATION_JSON_VALUE)
+//    public ResponseEntity<Sermon> search(@RequestParam("q") String query, @RequestParam int page, @RequestParam int size){
+//        final String url = "https://search-faithbibleaudio-test-o7t56t5553l4m33riniuxvw6nq.us-east-1.es.amazonaws.com/audio_data/sermons/_search?";
+//        final RestTemplate restTemplate = new RestTemplate();
+//
+//        ResponseEntity<String> result = restTemplate.getForEntity(url + "q="+ query, String.class);
+//
+//        return new ResponseEntity<>(new Sermon(), HttpStatus.OK);
+//    }
 
     @ResponseStatus(OK)
     @ApiResponses(value = {
@@ -63,7 +63,7 @@ public class AudioSearchController {
             @RequestParam int size){
 
         return searchService.findBySeries(query, PageRequest.of(page, size))
-                .map(s -> new Sermon(s.getId(), s.getTitle(), s.getSpeaker(), s.getSeries(), s.getDate()));
+                .map(s -> new Sermon(s));
     }
 
     @ResponseStatus(OK)
@@ -80,7 +80,7 @@ public class AudioSearchController {
             @RequestParam int size){
 
         return searchService.findBySpeaker(query, PageRequest.of(page, size))
-                .map(s -> new Sermon(s.getId(), s.getTitle(), s.getSpeaker(), s.getSeries(), s.getDate()));
+                .map(s -> new Sermon(s));
 
     }
 
