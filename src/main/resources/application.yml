@@ -11,8 +11,18 @@ spring:
 spring:
   profiles: local
   data:
+    elasticsearch:
+      properties:
+        path.home: target/elastic
+        transport.tcp.connect_timeout: 120s
+
+---
+
+spring:
+  profiles: localDocker
+  data:
     jest:
-      uri: http://localhost:9200
+      uri: http://host.docker.internal:9200
 
 ---
 
@@ -20,4 +30,4 @@ spring:
   profiles: prod
   data:
     jest:
-      uri: https://vpc-fbc-test-domain-l5gsjfna2i2676acjakzrihl64.us-east-1.es.amazonaws.com
+      uri: https://vpc-fbc-audio-nmdhsw47abfn4qogfcts76w2r4.us-east-1.es.amazonaws.com

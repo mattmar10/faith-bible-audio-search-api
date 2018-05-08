@@ -35,23 +35,29 @@ public class ESSermonService{
     }
 
     public void delete(final SermonDocumentModel sermonDocumentModel) {
+        logger.info(String.format("Deleting sermon [%s].", sermonDocumentModel));
         sermonRepository.delete(sermonDocumentModel);
     }
 
     public Page<SermonDocumentModel> findBySpeaker(final String speaker, final PageRequest pageRequest) {
+        logger.info(String.format("Searching for sermons by speaker [%s].", speaker));
         return sermonRepository.findBySpeaker(speaker, pageRequest);
     }
 
 
     public Page<SermonDocumentModel> findBySeries(final String series, final PageRequest pageRequest) {
+        logger.info(String.format("Searching for sermons by series [%s].", series));
         return sermonRepository.findBySeries(series, pageRequest);
     }
 
     public Optional<SermonDocumentModel>findById(final String id){
+        logger.info(String.format("Fetching details for sermon [%s].", id));
         return sermonRepository.findById(id);
     }
 
     public Page<SermonDocumentModel> findByFreeSearch(final String query, final PageRequest pageRequest) {
+
+        logger.info(String.format("Executing free form search with query [%s].", query));
 
         final SearchQuery searchQuery = new NativeSearchQueryBuilder()
                 .withQuery(multiMatchQuery(query)

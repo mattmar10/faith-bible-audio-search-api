@@ -7,17 +7,19 @@ buildscript {
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath('gradle.plugin.com.palantir.gradle.docker:gradle-docker:0.19.2')
 	}
 
 }
 
 plugins {
     id 'com.palantir.docker-run' version '0.19.2'
-
+    id 'com.palantir.docker' version '0.19.2'
 }
 
 
 apply plugin: "com.palantir.docker-run"
+apply plugin: "com.palantir.docker"
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
@@ -32,22 +34,18 @@ repositories {
 }
 
 dependencies {
-//	compile('org.springframework.boot:spring-boot-starter-data-jpa'){
-//        exclude module: "spring-boot-starter-logging"
-//        exclude module: "logback-classic"
-//    }
 	compile('org.springframework.boot:spring-boot-starter-hateoas')
 	compile('com.github.vanroy:spring-boot-starter-data-jest:3.1.2.RELEASE')
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
-    //compile('org.springframework.boot:spring-boot-starter-log4j2')
     compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.6" // for serialization of LocalDateTime in Java 8
     compile('io.springfox:springfox-swagger2:2.8.0')
-	//runtime('org.postgresql:postgresql')
+    compile("io.springfox:springfox-swagger-ui:2.0.2")
+    compile('org.springframework.boot:spring-boot-starter-actuator')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
 tasks.findByName('dockerRemoveContainer').dependsOn('dockerStop')
 tasks.findByName('dockerRun').dependsOn('dockerRemoveContainer')
-
+//tasks.findByName('test').dependsOn('dockerRun')
 task runLocal(dependsOn: 'dockerRun'){
     doLast {
         println 'launching docker... be patient'
@@ -57,8 +55,15 @@ task runLocal(dependsOn: 'dockerRun'){
 
 runLocal.finalizedBy('bootRun')
 
+docker {
+    dependsOn(build)
+    name "${project.group}/${bootJar.baseName}"
+    files bootJar.archivePath
+    buildArgs(['JAR_FILE': "${bootJar.archiveName}"])
+}
+
 configurations {
-    //runtime.exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
+    runtime.exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
 
     dockerRun {
         name 'elasticsearch'
@@ -67,4 +72,7 @@ configurations {
         daemonize true
         env 'discovery.type': 'single-node'
     }
+
+
+
 }
