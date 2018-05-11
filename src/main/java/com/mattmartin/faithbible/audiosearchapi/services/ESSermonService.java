@@ -8,12 +8,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
+import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.multiMatchQuery;
 
 @Service
@@ -67,6 +71,15 @@ public class ESSermonService{
                         .type(MultiMatchQueryBuilder.Type.BEST_FIELDS))
                 .withPageable(pageRequest)
                 .build();
+
+        return sermonRepository.search(searchQuery);
+    }
+
+    public Page<SermonDocumentModel> findMostRecent(final int count) {
+        logger.info(String.format("Finding most recent sermon"));
+
+        final SearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(matchAllQuery()).withPageable(PageRequest.of(0, count, Sort.Direction.DESC, "date")).build();
 
         return sermonRepository.search(searchQuery);
     }
