@@ -1,7 +1,10 @@
 package com.mattmartin.faithbible.audiosearchapi.controllers;
 
+import com.mattmartin.faithbible.audiosearchapi.dtos.Series;
 import com.mattmartin.faithbible.audiosearchapi.dtos.Sermon;
+import com.mattmartin.faithbible.audiosearchapi.models.SeriesModel;
 import com.mattmartin.faithbible.audiosearchapi.models.SermonDocumentModel;
+import com.mattmartin.faithbible.audiosearchapi.services.ESSeriesService;
 import com.mattmartin.faithbible.audiosearchapi.services.ESSermonService;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -22,15 +25,17 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @CrossOrigin
-public class SermonController {
+public class SeriesController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final ESSermonService searchService;
+    private final ESSeriesService seriesService;
 
     @Autowired
-    public SermonController(final ESSermonService sService){
+    public SeriesController(final ESSermonService sService, final ESSeriesService esSeriesService){
         this.searchService = sService;
+        this.seriesService = esSeriesService;
     }
 
     @ResponseStatus(OK)
@@ -39,18 +44,19 @@ public class SermonController {
             @ApiResponse(code = 404, message = "Not Found")
     })
     @RequestMapping(method = RequestMethod.GET,
-            value = "/sermon/{id}",
+            value = "/series/{id}",
             produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Sermon> findById(@PathVariable("id") String id){
-        final Optional<SermonDocumentModel> sermonMaybe = searchService.findById(id);
+    public ResponseEntity<Series> findById(@PathVariable("id") String id){
+        final Optional<SeriesModel> seriesMaybe = seriesService.findById(id);
 
-        if(sermonMaybe.isPresent()){
-            return new ResponseEntity<Sermon>(new Sermon(sermonMaybe.get()), HttpStatus.OK);
+        if(seriesMaybe.isPresent()){
+            return new ResponseEntity<Series>(new Series(seriesMaybe.get()), HttpStatus.OK);
         }
         else{
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
 
     @ResponseStatus(OK)
     @ApiResponses(value = {
@@ -58,25 +64,22 @@ public class SermonController {
             @ApiResponse(code = 404, message = "Not Found", response = String.class),
             @ApiResponse(code = 503, message = "Service Unavailable")
     })
-    @RequestMapping(method = RequestMethod.GET, value = "/sermons/mostrecent")
-    public ResponseEntity<Iterable<Sermon>> findMostRecentSermons(@RequestParam("count") int count){
-        logger.info("Finding most recent sermons");
+    @RequestMapping(method = RequestMethod.GET, value = "/series/mostrecent")
+    public ResponseEntity<Iterable<Series>> findMostRecentSermons(@RequestParam("count") int count){
+        logger.info("Finding most recent series");
 
+        final List<SeriesModel> results = searchService.findMostRecentSeries(count);
 
-        final Page<SermonDocumentModel> sdms = searchService.findMostRecent(count);
-
-
-        if(sdms.getTotalElements() == 0){
+        if(results.size() == 0){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         else{
-            final List<Sermon> found =
-                    sdms.stream()
-                            .map(sermonDocumentModel -> new Sermon(sermonDocumentModel)).collect(Collectors.toList());
+            final List<Series> found =
+                    results.stream()
+                            .map(seriesModel -> new Series(seriesModel)).collect(Collectors.toList());
 
             return new ResponseEntity<>(found, HttpStatus.OK);
         }
 
     }
-
 }

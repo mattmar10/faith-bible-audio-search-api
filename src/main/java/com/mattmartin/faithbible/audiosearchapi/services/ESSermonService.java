@@ -1,23 +1,36 @@
 package com.mattmartin.faithbible.audiosearchapi.services;
 
+import com.github.vanroy.springdata.jest.JestElasticsearchTemplate;
+import com.github.vanroy.springdata.jest.aggregation.AggregatedPage;
+import com.google.common.collect.Lists;
+import com.mattmartin.faithbible.audiosearchapi.dtos.Series;
+import com.mattmartin.faithbible.audiosearchapi.dtos.Sermon;
+import com.mattmartin.faithbible.audiosearchapi.models.SeriesModel;
 import com.mattmartin.faithbible.audiosearchapi.models.SermonDocumentModel;
 import com.mattmartin.faithbible.audiosearchapi.repositories.SermonRepository;
+import io.searchbox.core.Search;
+import io.searchbox.core.search.aggregation.TermsAggregation;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+import org.elasticsearch.search.sort.SortBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.multiMatchQuery;
 
 @Service
@@ -27,10 +40,12 @@ public class ESSermonService{
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final SermonRepository sermonRepository;
+    private final JestElasticsearchTemplate elasticsearchTemplate;
 
     @Autowired
-    public ESSermonService(final SermonRepository repo){
+    public ESSermonService(final SermonRepository repo, final JestElasticsearchTemplate elasticsearchTemplate){
         this.sermonRepository = repo;
+        this.elasticsearchTemplate = elasticsearchTemplate;
     }
 
     public SermonDocumentModel save(final SermonDocumentModel sermon) {
@@ -51,7 +66,13 @@ public class ESSermonService{
 
     public Page<SermonDocumentModel> findBySeries(final String series, final PageRequest pageRequest) {
         logger.info(String.format("Searching for sermons by series [%s].", series));
-        return sermonRepository.findBySeries(series, pageRequest);
+
+        final SearchQuery query = new NativeSearchQueryBuilder()
+                .withQuery(matchQuery("series", series))
+                .withPageable(pageRequest)
+                .build();
+
+        return sermonRepository.search(query);
     }
 
     public Optional<SermonDocumentModel>findById(final String id){
@@ -82,5 +103,30 @@ public class ESSermonService{
                 .withQuery(matchAllQuery()).withPageable(PageRequest.of(0, count, Sort.Direction.DESC, "date")).build();
 
         return sermonRepository.search(searchQuery);
+    }
+
+    public List<SeriesModel> findMostRecentSeries(final int count){
+        final SearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(matchAllQuery())
+                .withPageable(PageRequest.of(0, 200, Sort.Direction.DESC, "date"))
+                .build();
+
+        final Page<SermonDocumentModel> results = sermonRepository.search(searchQuery);
+
+        final List<SeriesModel> seriesSet = new ArrayList<>();
+        for(SermonDocumentModel documentModel: results){
+            final SeriesModel series = SeriesModel.fromSermon(documentModel);
+
+            if(!seriesSet.contains(series)){
+                seriesSet.add(series);
+            }
+
+            if(seriesSet.size() >= count){
+                break;
+            }
+        }
+
+        return seriesSet;
+
     }
 }

@@ -13,37 +13,33 @@ public class Sermon {
     private String title;
     private String speaker;
     private String series;
+
+    private Optional<String> seriesLink;
     private LocalDate date;
     private URI mp3URI;
+    private Optional<URI> imageURI;
     private Optional<URI> pdfURI;
-
-    public URI getMp3URI() {
-        return mp3URI;
-    }
-
-    public void setMp3URI(URI mp3URI) {
-        this.mp3URI = mp3URI;
-    }
-
-    public Optional<URI> getPdfURI() {
-        return pdfURI;
-    }
-
-    public void setPdfURI(Optional<URI> pdfURI) {
-        this.pdfURI = pdfURI;
-    }
 
     public Sermon(final SermonDocumentModel documentModel){
         this.id = documentModel.getId();
-        this.title = documentModel.getTitle();
+        this.title = documentModel.getTitle().contains("(") ?
+                        documentModel.getTitle().substring(0, documentModel.getTitle().indexOf("(") - 1) :
+                        documentModel.getTitle();
         this.speaker = documentModel.getSpeaker();
         this.series = documentModel.getSeries();
+
         this.date = documentModel.getDate();
         this.mp3URI = URI.create(documentModel.getMedia().getMp3());
+
+        this.imageURI = (documentModel.getImage().isPresent()) ?
+                Optional.of(URI.create(documentModel.getImage().get())) :
+                Optional.empty();
 
         this.pdfURI = (documentModel.getMedia().getPdf() != null ) ?
                 Optional.of(URI.create(documentModel.getMedia().getPdf())) :
                 Optional.empty();
+
+        this.seriesLink = documentModel.getSeriesId().map(id -> "/series/" + id);
     }
 
 
@@ -89,6 +85,38 @@ public class Sermon {
         this.date = date;
     }
 
+    public Optional<URI> getImageURI() {
+        return imageURI;
+    }
+
+    public void setImageURI(Optional<URI> imageURI) {
+        this.imageURI = imageURI;
+    }
+
+    public URI getMp3URI() {
+        return mp3URI;
+    }
+
+    public void setMp3URI(URI mp3URI) {
+        this.mp3URI = mp3URI;
+    }
+
+    public Optional<URI> getPdfURI() {
+        return pdfURI;
+    }
+
+    public void setPdfURI(Optional<URI> pdfURI) {
+        this.pdfURI = pdfURI;
+    }
+
+    public Optional<String> getSeriesLink() {
+        return seriesLink;
+    }
+
+    public void setSeriesLink(Optional<String> seriesLink) {
+        this.seriesLink = seriesLink;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -102,6 +130,7 @@ public class Sermon {
         if (!series.equals(sermon.series)) return false;
         if (!date.equals(sermon.date)) return false;
         if (!mp3URI.equals(sermon.mp3URI)) return false;
+        if (!imageURI.equals(sermon.imageURI)) return false;
         return pdfURI.equals(sermon.pdfURI);
     }
 
@@ -114,6 +143,7 @@ public class Sermon {
         result = 31 * result + date.hashCode();
         result = 31 * result + mp3URI.hashCode();
         result = 31 * result + pdfURI.hashCode();
+        result = 31 * result + imageURI.hashCode();
         return result;
     }
 
@@ -127,6 +157,7 @@ public class Sermon {
         sb.append(", date=").append(date);
         sb.append(", mp3URI=").append(mp3URI);
         sb.append(", pdfURI=").append(pdfURI);
+        sb.append(", imageURI=").append(imageURI);
         sb.append('}');
         return sb.toString();
     }

@@ -2,10 +2,14 @@ package com.mattmartin.faithbible.audiosearchapi.controllers;
 
 import com.mattmartin.faithbible.audiosearchapi.dtos.Sermon;
 import com.mattmartin.faithbible.audiosearchapi.models.AudioJsonSource;
+import com.mattmartin.faithbible.audiosearchapi.models.SeriesModel;
 import com.mattmartin.faithbible.audiosearchapi.models.SermonDocumentModel;
+import com.mattmartin.faithbible.audiosearchapi.services.ESSeriesService;
 import com.mattmartin.faithbible.audiosearchapi.services.ESSermonService;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.hibernate.validator.internal.constraintvalidators.hv.URLValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +21,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -31,10 +40,13 @@ public class SermonSearchController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final ESSermonService searchService;
+    private final ESSeriesService seriesService;
 
     @Autowired
-    public SermonSearchController(final ESSermonService sService){
+    public SermonSearchController(final ESSermonService sService,
+                                  final ESSeriesService eSeriesService){
         this.searchService = sService;
+        this.seriesService = eSeriesService;
     }
 
     @ResponseStatus(OK)
@@ -115,12 +127,39 @@ public class SermonSearchController {
 
         logger.info("Response from data source " +response.getStatusCode());
 
-        Arrays.stream(response.getBody()).parallel().forEach(sermon -> {
+        Map<String, SeriesModel> seriesMap = new HashMap<>();
+
+        Arrays.stream(response.getBody()).forEach(sermon -> {
+
+            sermon.getImage().ifPresent(s -> {
+
+                String encoded = convertToURLEscapingIllegalCharacters(s);
+
+                sermon.setImage(Optional.ofNullable(encoded));
+            });
+
+
 
             try{
-                final String id = getMD5(sermon);
+                final String seriesId = getMD5(sermon.getSeries());
+
+                final String id = getMD5(sermon.getTitle());
                 sermon.setId(id);
+                sermon.setSeriesId(Optional.of(seriesId));
                 searchService.save(sermon);
+
+                final SeriesModel seriesModel =
+                        new SeriesModel(seriesId, sermon.getSeries(), sermon.getImage().map(s -> URI.create(s)));
+
+                if(seriesMap.get(seriesId) == null){
+                    seriesModel.addSermon(sermon);
+                    seriesMap.put(seriesId, seriesModel);
+                }
+                else if(!seriesMap.get(seriesId).getSermons().contains(sermon)){
+                    seriesMap.get(seriesId).addSermon(sermon);
+                }
+
+
             }
             catch (Exception e){
                 logger.error("Unable to persist sermon", e);
@@ -128,13 +167,19 @@ public class SermonSearchController {
 
         });
 
+        for (SeriesModel seriesModel : seriesMap.values()) {
+            seriesService.save(seriesModel);
+        }
+
+
+
     }
 
-    private String getMD5(final SermonDocumentModel sermon) throws NoSuchAlgorithmException {
+    private String getMD5(final String data) throws NoSuchAlgorithmException {
 
 
         final MessageDigest md = MessageDigest.getInstance("MD5");
-        md.update(sermon.getTitle().getBytes());
+        md.update(data.getBytes());
 
         byte byteData[] = md.digest();
 
@@ -145,6 +190,18 @@ public class SermonSearchController {
         }
 
         return sb.toString();
+    }
+
+    private String convertToURLEscapingIllegalCharacters(String string){
+        try {
+            String decodedURL = URLDecoder.decode(string, "UTF-8");
+            URL url = new URL(decodedURL);
+            URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
+            return uri.toURL().toString();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 
 

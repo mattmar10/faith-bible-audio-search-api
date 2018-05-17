@@ -5,10 +5,13 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.tomcat.jni.Local;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Optional;
 
 
 @Document(indexName = "audio_data", type = "sermons")
@@ -21,13 +24,18 @@ public class SermonDocumentModel {
     private String href;
     private String speaker;
     private LocalDate date;
+
     private String series;
+    private Optional<String> seriesId;
+
+    private Optional<String> image;
     private SermonMediaModel media;
 
     public SermonDocumentModel(){}
 
     public SermonDocumentModel(final String id, final String title, final String href, final String speaker,
-                               final LocalDate date, final String series, final SermonMediaModel media) {
+                               final LocalDate date, final String series, Optional<String> seriesId,
+                               final Optional<String> image, final SermonMediaModel media) {
         this.id = id;
         this.title = title;
         this.href = href;
@@ -35,6 +43,8 @@ public class SermonDocumentModel {
         this.date = date;
         this.series = series;
         this.media = media;
+        this.image = image;
+        this.seriesId = seriesId;
     }
 
     public String getId() {
@@ -93,6 +103,18 @@ public class SermonDocumentModel {
         this.media = media;
     }
 
+    public void setImage(Optional<String> imageUrl){ this.image = imageUrl; }
+
+    public Optional<String> getImage(){ return this.image; };
+
+    public Optional<String> getSeriesId() {
+        return seriesId;
+    }
+
+    public void setSeriesId(Optional<String> seriesId) {
+        this.seriesId = seriesId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -117,6 +139,7 @@ public class SermonDocumentModel {
                 ", speaker='" + speaker + '\'' +
                 ", date=" + date +
                 ", series='" + series + '\'' +
+                ", seriesId='" + seriesId + '\'' +
                 ", media=" + media +
                 '}';
     }

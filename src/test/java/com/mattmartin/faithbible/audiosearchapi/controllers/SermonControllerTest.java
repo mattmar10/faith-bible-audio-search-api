@@ -56,6 +56,8 @@ public class SermonControllerTest {
                         "Dr Mark Hitchcock",
                         FaithDateTimeFormatter.getLocalDate("2015-06-21"),
                         "Father's Day",
+                        Optional.of("fathersDay123"),
+                        Optional.of("https://s3.amazonaws.com/faith-bible-data/mp3-images/2014_0323+Revelation+3+1-6+The+Church+of+the+Walking+Dead.mp3.jpg"),
                         mediaModel);
 
         when(esSermonService.findById("fakeId")).thenReturn(Optional.of(manual));
@@ -93,6 +95,8 @@ public class SermonControllerTest {
                         "Dr Mark Hitchcock",
                         FaithDateTimeFormatter.getLocalDate("2015-06-21"),
                         "Father's Day",
+                        Optional.of("fathersDay123"),
+                        Optional.of("https://s3.amazonaws.com/faith-bible-data/mp3-images/2014_0323+Revelation+3+1-6+The+Church+of+the+Walking+Dead.mp3.jpg"),
                         mediaModel);
 
         final SermonDocumentModel manual2 =
@@ -103,6 +107,8 @@ public class SermonControllerTest {
                         "Dr Mark Hitchcock",
                         FaithDateTimeFormatter.getLocalDate("2015-06-21"),
                         "Some Series",
+                        Optional.of("fathersDay123"),
+                        Optional.empty(),
                         mediaModel2);
 
         final PageImpl<SermonDocumentModel> pageImpl =

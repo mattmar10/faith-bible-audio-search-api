@@ -14,6 +14,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
+import java.util.Optional;
 
 public class SermonDocumentModelJsonTest {
 
@@ -48,6 +49,8 @@ public class SermonDocumentModelJsonTest {
                         "Dr Mark Hitchcock",
                         FaithDateTimeFormatter.getLocalDate("2015-06-21"),
                         "Father's Day",
+                        Optional.of("fathersDay123"),
+                        Optional.empty(),
                         mediaModel);
 
         assertThat(parsed, equalTo(manual));

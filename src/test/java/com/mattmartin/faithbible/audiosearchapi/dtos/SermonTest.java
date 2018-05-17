@@ -6,6 +6,7 @@ import com.mattmartin.faithbible.audiosearchapi.models.SermonMediaModel;
 import org.junit.Test;
 
 import java.net.URI;
+import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -28,6 +29,8 @@ public class SermonTest {
                         "Dr Mark Hitchcock",
                         FaithDateTimeFormatter.getLocalDate("2015-06-21"),
                         "Father's Day",
+                        Optional.of("fathersDay123"),
+                        Optional.empty(),
                         mediaModel);
 
         final Sermon sermon =  new Sermon(manual);
@@ -56,6 +59,8 @@ public class SermonTest {
                         "Dr Mark Hitchcock",
                         FaithDateTimeFormatter.getLocalDate("2015-06-21"),
                         "Father's Day",
+                        Optional.of("fathersDay123"),
+                        Optional.empty(),
                         mediaModel);
 
         final Sermon sermon =  new Sermon(manual);

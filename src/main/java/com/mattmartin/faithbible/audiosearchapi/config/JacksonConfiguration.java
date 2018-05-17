@@ -46,4 +46,14 @@ public class JacksonConfiguration {
                 new DefaultJestResultsMapper(simpleElasticsearchMappingContext, new CustomEntityMapper()));
     }
 
+    @Bean
+    public JestElasticsearchTemplate getElasticSearchTemplate(final JestClient jestClient,
+                                                              final ElasticsearchConverter elasticsearchConverter,
+                                                              final SimpleElasticsearchMappingContext simpleElasticsearchMappingContext){
+        return new JestElasticsearchTemplate(
+                jestClient,
+                elasticsearchConverter,
+                new DefaultJestResultsMapper(simpleElasticsearchMappingContext, new CustomEntityMapper()));
+    }
+
 }

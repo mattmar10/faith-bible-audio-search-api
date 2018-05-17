@@ -21,9 +21,10 @@ plugins {
 apply plugin: "com.palantir.docker-run"
 apply plugin: "com.palantir.docker"
 apply plugin: 'java'
-apply plugin: 'eclipse'
+apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
+
 
 group = 'com.mattmartin.faithbible'
 version = '0.0.1-SNAPSHOT'
@@ -34,7 +35,11 @@ repositories {
 }
 
 dependencies {
-	compile('org.springframework.boot:spring-boot-starter-hateoas')
+	compile('org.springframework.boot:spring-boot-starter-hateoas'){
+        exclude module: "spring-boot-starter-logging"
+        exclude module: "logback-classic"
+    }
+    compile('org.springframework.boot:spring-boot-starter-log4j2')
 	compile('com.github.vanroy:spring-boot-starter-data-jest:3.1.2.RELEASE')
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
     compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.6" // for serialization of LocalDateTime in Java 8
@@ -63,7 +68,8 @@ docker {
 }
 
 configurations {
-    runtime.exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
+    all*.exclude module: 'spring-boot-starter-logging'
+    all*.exclude module: "logback-classic"
 
     dockerRun {
         name 'elasticsearch'
