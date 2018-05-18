@@ -65,10 +65,10 @@ public class SeriesController {
             @ApiResponse(code = 503, message = "Service Unavailable")
     })
     @RequestMapping(method = RequestMethod.GET, value = "/series/mostrecent")
-    public ResponseEntity<Iterable<Series>> findMostRecentSermons(@RequestParam("count") int count){
+    public ResponseEntity<Iterable<Series>> findMostRecentSeries(@RequestParam("count") int count){
         logger.info("Finding most recent series");
 
-        final List<SeriesModel> results = searchService.findMostRecentSeries(count);
+        final List<SeriesModel> results = seriesService.findMostRecentSeries(count);
 
         if(results.size() == 0){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

@@ -105,28 +105,4 @@ public class ESSermonService{
         return sermonRepository.search(searchQuery);
     }
 
-    public List<SeriesModel> findMostRecentSeries(final int count){
-        final SearchQuery searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(matchAllQuery())
-                .withPageable(PageRequest.of(0, 200, Sort.Direction.DESC, "date"))
-                .build();
-
-        final Page<SermonDocumentModel> results = sermonRepository.search(searchQuery);
-
-        final List<SeriesModel> seriesSet = new ArrayList<>();
-        for(SermonDocumentModel documentModel: results){
-            final SeriesModel series = SeriesModel.fromSermon(documentModel);
-
-            if(!seriesSet.contains(series)){
-                seriesSet.add(series);
-            }
-
-            if(seriesSet.size() >= count){
-                break;
-            }
-        }
-
-        return seriesSet;
-
-    }
 }
