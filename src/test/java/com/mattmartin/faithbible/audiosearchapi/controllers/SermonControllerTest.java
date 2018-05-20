@@ -65,7 +65,7 @@ public class SermonControllerTest {
         ResponseEntity<Sermon> response = sermonController.findById("fakeId");
 
         assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
-        assertThat(response.getBody(), equalTo(new Sermon(manual)));
+        assertThat(response.getBody(), equalTo(Sermon.fromModel(manual)));
     }
 
     @Test
@@ -120,8 +120,8 @@ public class SermonControllerTest {
         ResponseEntity<Iterable<Sermon>> response = sermonController.findMostRecentSermons(2);
 
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
-        assertTrue(Iterables.contains(response.getBody(), new Sermon(manual)));
-        assertTrue(Iterables.contains(response.getBody(), new Sermon(manual2)));
+        assertTrue(Iterables.contains(response.getBody(), Sermon.fromModel(manual)));
+        assertTrue(Iterables.contains(response.getBody(), Sermon.fromModel(manual2)));
         assertThat(Iterables.size(response.getBody()), is(2));
     }
 }

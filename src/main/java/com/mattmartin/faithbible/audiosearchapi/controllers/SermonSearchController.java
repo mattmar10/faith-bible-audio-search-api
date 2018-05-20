@@ -37,7 +37,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 public class SermonSearchController {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger logger = LoggerFactory.getLogger(SermonSearchController.class);
 
     private final ESSermonService searchService;
     private final ESSeriesService seriesService;
@@ -64,7 +64,7 @@ public class SermonSearchController {
         final Page<SermonDocumentModel> found =
                 searchService.findByFreeSearch(query, PageRequest.of(page, size, Sort.Direction.DESC, "date"));
 
-        final Iterable<Sermon> mapped = found.map(sermonDocumentModel -> new Sermon(sermonDocumentModel));
+        final Iterable<Sermon> mapped = found.map(sermonDocumentModel -> Sermon.fromModel(sermonDocumentModel));
 
         return new ResponseEntity<Iterable<Sermon>>(mapped, HttpStatus.OK);
     }
@@ -85,7 +85,7 @@ public class SermonSearchController {
          final Page<SermonDocumentModel> found =
                  searchService.findBySeries(query, PageRequest.of(page, size, Sort.Direction.DESC, "date"));
 
-        final Iterable<Sermon> mapped = found.map(sermonDocumentModel -> new Sermon(sermonDocumentModel));
+        final Iterable<Sermon> mapped = found.map(sermonDocumentModel -> Sermon.fromModel(sermonDocumentModel));
 
         return new ResponseEntity<Iterable<Sermon>>(mapped, HttpStatus.OK);
     }
@@ -106,7 +106,7 @@ public class SermonSearchController {
         final Page<SermonDocumentModel> found =
                 searchService.findBySpeaker(query, PageRequest.of(page, size, Sort.Direction.DESC, "date"));
 
-        final Iterable<Sermon> mapped = found.map(sermonDocumentModel -> new Sermon(sermonDocumentModel));
+        final Iterable<Sermon> mapped = found.map(sermonDocumentModel -> Sermon.fromModel(sermonDocumentModel));
 
         return new ResponseEntity<Iterable<Sermon>>(mapped, HttpStatus.OK);
     }

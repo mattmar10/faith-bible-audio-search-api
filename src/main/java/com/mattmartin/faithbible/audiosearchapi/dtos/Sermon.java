@@ -1,6 +1,8 @@
 package com.mattmartin.faithbible.audiosearchapi.dtos;
 
 import com.mattmartin.faithbible.audiosearchapi.models.SermonDocumentModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URL;
@@ -8,6 +10,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 public class Sermon {
+    private static final Logger logger = LoggerFactory.getLogger(Sermon.class);
 
     private String id;
     private String title;
@@ -16,32 +19,47 @@ public class Sermon {
 
     private Optional<String> seriesLink;
     private LocalDate date;
-    private URI mp3URI;
+    private Optional<URI> mp3URI;
     private Optional<URI> imageURI;
     private Optional<URI> pdfURI;
 
-    public Sermon(final SermonDocumentModel documentModel){
-        this.id = documentModel.getId();
-        this.title = documentModel.getTitle().contains("(") ?
-                        documentModel.getTitle().substring(0, documentModel.getTitle().indexOf("(") - 1) :
-                        documentModel.getTitle();
-        this.speaker = documentModel.getSpeaker();
-        this.series = documentModel.getSeries();
+    public static Sermon fromModel(final SermonDocumentModel documentModel) throws IllegalStateException{
+        final String docId = documentModel.getId();
+        final String title = documentModel.getTitle().contains("(") ?
+                documentModel.getTitle().substring(0, documentModel.getTitle().indexOf("(") - 1) :
+                documentModel.getTitle();
+        final String speaker = documentModel.getSpeaker();
+        final String series = documentModel.getSeries();
+        final LocalDate date = documentModel.getDate();
+        final Optional<URI> mp3URI = documentModel.getMedia().getMp3().map(URI::create);
+        final Optional<URI> imageURI = documentModel.getImage().map(URI::create);
+        final Optional<URI> pdfURI = documentModel.getMedia().getPdf().map(URI::create);
+        final Optional<String> seriesLink = documentModel.getSeriesId().map(id -> "/series/" + id);
 
-        this.date = documentModel.getDate();
-        this.mp3URI = URI.create(documentModel.getMedia().getMp3());
+        return new Sermon(docId, title, speaker, series, seriesLink, date, mp3URI, imageURI, pdfURI );
 
-        this.imageURI = (documentModel.getImage().isPresent()) ?
-                Optional.of(URI.create(documentModel.getImage().get())) :
-                Optional.empty();
-
-        this.pdfURI = (documentModel.getMedia().getPdf() != null ) ?
-                Optional.of(URI.create(documentModel.getMedia().getPdf())) :
-                Optional.empty();
-
-        this.seriesLink = documentModel.getSeriesId().map(id -> "/series/" + id);
     }
 
+    private Sermon( final String id,
+                   final String title,
+                   final String speaker,
+                   final String series,
+                   final Optional<String> seriesLink,
+                   final LocalDate date,
+                   final Optional<URI> mp3URI,
+                   final Optional<URI> imageURI,
+                   final Optional<URI> pdfURI ) {
+
+        this.id = id;
+        this.title = title;
+        this.speaker = speaker;
+        this.series = series;
+        this.seriesLink = seriesLink;
+        this.date = date;
+        this.mp3URI = mp3URI;
+        this.imageURI = imageURI;
+        this.pdfURI = pdfURI;
+    }
 
     public String getId(){
         return this.id;
@@ -93,11 +111,11 @@ public class Sermon {
         this.imageURI = imageURI;
     }
 
-    public URI getMp3URI() {
+    public Optional<URI> getMp3URI() {
         return mp3URI;
     }
 
-    public void setMp3URI(URI mp3URI) {
+    public void setMp3URI(Optional<URI> mp3URI) {
         this.mp3URI = mp3URI;
     }
 

@@ -33,15 +33,15 @@ public class SermonTest {
                         Optional.empty(),
                         mediaModel);
 
-        final Sermon sermon =  new Sermon(manual);
+        final Sermon sermon = Sermon.fromModel(manual);
 
         assertThat(sermon.getId(), is(manual.getId()));
         assertThat(sermon.getTitle(), is(manual.getTitle()));
         assertThat(sermon.getDate(), is(manual.getDate()));
         assertThat(sermon.getSeries(), is(manual.getSeries()));
         assertThat(sermon.getSpeaker(), is(manual.getSpeaker()));
-        assertThat(sermon.getMp3URI(), is(URI.create(manual.getMedia().getMp3())));
-        assertThat(sermon.getPdfURI().get(), is(URI.create(manual.getMedia().getPdf())));
+        assertThat(sermon.getMp3URI(), is(Optional.of(URI.create(manual.getMedia().getMp3().get()))));
+        assertThat(sermon.getPdfURI(), is(Optional.of(URI.create(manual.getMedia().getPdf().get()))));
     }
 
     @Test
@@ -63,8 +63,8 @@ public class SermonTest {
                         Optional.empty(),
                         mediaModel);
 
-        final Sermon sermon =  new Sermon(manual);
-        final Sermon sermon2 = new Sermon(manual);
+        final Sermon sermon =  Sermon.fromModel(manual);
+        final Sermon sermon2 = Sermon.fromModel(manual);
 
         assertThat(sermon, equalTo(sermon2));
         assertThat(sermon.hashCode(), equalTo(sermon2.hashCode()));

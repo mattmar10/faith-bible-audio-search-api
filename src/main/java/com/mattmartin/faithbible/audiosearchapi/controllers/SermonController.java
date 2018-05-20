@@ -45,7 +45,7 @@ public class SermonController {
         final Optional<SermonDocumentModel> sermonMaybe = searchService.findById(id);
 
         if(sermonMaybe.isPresent()){
-            return new ResponseEntity<Sermon>(new Sermon(sermonMaybe.get()), HttpStatus.OK);
+            return new ResponseEntity<Sermon>(Sermon.fromModel(sermonMaybe.get()), HttpStatus.OK);
         }
         else{
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -72,7 +72,7 @@ public class SermonController {
         else{
             final List<Sermon> found =
                     sdms.stream()
-                            .map(sermonDocumentModel -> new Sermon(sermonDocumentModel)).collect(Collectors.toList());
+                            .map(sermonDocumentModel -> Sermon.fromModel(sermonDocumentModel)).collect(Collectors.toList());
 
             return new ResponseEntity<>(found, HttpStatus.OK);
         }

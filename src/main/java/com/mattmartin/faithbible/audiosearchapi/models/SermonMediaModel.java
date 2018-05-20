@@ -1,31 +1,35 @@
 package com.mattmartin.faithbible.audiosearchapi.models;
 
+import java.util.Optional;
+
 public class SermonMediaModel {
 
-    private String pdf;
-    private String mp3;
+    private Optional<String> pdf;
+    private Optional<String> mp3;
 
     SermonMediaModel(){}
 
-    public SermonMediaModel(final String pdf, final String mp3){
-        this.pdf = pdf;
-        this.mp3 = mp3;
+    public SermonMediaModel(final String pdf, final String mp3) throws IllegalArgumentException{
+
+
+        this.pdf = Optional.of(pdf);
+        this.mp3 = Optional.of(mp3);
     }
 
-    public String getPdf() {
+    public Optional<String> getPdf() {
         return pdf;
     }
 
     public void setPdf(String pdf) {
-        this.pdf = pdf;
+        this.pdf = Optional.ofNullable(pdf);
     }
 
-    public String getMp3() {
+    public Optional<String> getMp3() {
         return mp3;
     }
 
-    public void setMp3(String mp3) {
-        this.mp3 = mp3;
+    public void setMp3(String mp3) throws IllegalArgumentException {
+        this.mp3 = Optional.ofNullable(mp3);
     }
 
     @Override

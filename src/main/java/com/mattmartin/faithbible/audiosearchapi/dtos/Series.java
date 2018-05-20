@@ -26,7 +26,7 @@ public class Series {
                 Optional.empty() :
                 Optional.of(
                         sermonModels.stream()
-                                .map(s -> new Sermon(s))
+                                .map(s -> Sermon.fromModel(s))
                                 .collect(Collectors.toList()));
     }
 
