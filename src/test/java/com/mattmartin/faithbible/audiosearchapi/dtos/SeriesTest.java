@@ -1,6 +1,6 @@
 package com.mattmartin.faithbible.audiosearchapi.dtos;
 
-import com.mattmartin.faithbible.audiosearchapi.models.SeriesModel;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SeriesModel;
 import org.junit.Test;
 
 import java.net.URI;

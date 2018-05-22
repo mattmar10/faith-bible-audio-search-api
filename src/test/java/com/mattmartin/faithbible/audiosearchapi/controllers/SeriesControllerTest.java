@@ -2,18 +2,21 @@ package com.mattmartin.faithbible.audiosearchapi.controllers;
 
 import com.mattmartin.faithbible.audiosearchapi.config.FaithDateTimeFormatter;
 import com.mattmartin.faithbible.audiosearchapi.dtos.Series;
-import com.mattmartin.faithbible.audiosearchapi.dtos.Sermon;
-import com.mattmartin.faithbible.audiosearchapi.models.SeriesModel;
-import com.mattmartin.faithbible.audiosearchapi.models.SermonDocumentModel;
-import com.mattmartin.faithbible.audiosearchapi.services.ESSeriesService;
-import com.mattmartin.faithbible.audiosearchapi.services.ESSermonService;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SeriesModel;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonDocumentModel;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.StatsModel;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.services.ESSeriesService;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.services.ESSermonService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -47,6 +50,8 @@ public class SeriesControllerTest {
 
     @Test
     public void testFindById(){
+        final StatsModel statsModel = new StatsModel(20, 3, 7);
+        Set<String> tags = new HashSet<>(Arrays.asList("tag1", "tag2"));
         final SermonDocumentModel manual =
                 new SermonDocumentModel(
                         "fakeId",
@@ -55,9 +60,11 @@ public class SeriesControllerTest {
                         "Dr Mark Hitchcock",
                         FaithDateTimeFormatter.getLocalDate("2015-06-21"),
                         "Father's Day",
+                        null,
                         Optional.of("fathersDay123"),
+                        Optional.of(statsModel),
                         Optional.empty(),
-                        null);
+                        Optional.of(tags));
 
         final SeriesModel seriesModel = new SeriesModel("id", "title", Optional.empty());
 

@@ -1,12 +1,13 @@
 package com.mattmartin.faithbible.audiosearchapi.dtos;
 
-import com.mattmartin.faithbible.audiosearchapi.models.SeriesModel;
-import com.mattmartin.faithbible.audiosearchapi.models.SermonDocumentModel;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SeriesModel;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonDocumentModel;
 import org.springframework.util.CollectionUtils;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Series {
@@ -15,6 +16,8 @@ public class Series {
     private String title;
     private Optional<URI> imageURI;
     private Optional<List<Sermon>> sermons;
+    private Optional<Stats> stats;
+    private Optional<Set<String>> tags;
 
     public Series(final SeriesModel seriesModel){
         this.title = seriesModel.getTitle();
@@ -28,6 +31,9 @@ public class Series {
                         sermonModels.stream()
                                 .map(s -> Sermon.fromModel(s))
                                 .collect(Collectors.toList()));
+
+        this.stats = seriesModel.getStats().map(
+                statsModel -> new Stats(statsModel.getPlays(), statsModel.getLikes(), statsModel.getShares()));
     }
 
     public String getTitle() {

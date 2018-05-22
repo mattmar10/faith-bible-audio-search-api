@@ -1,13 +1,9 @@
-package com.mattmartin.faithbible.audiosearchapi.repositories;
+package com.mattmartin.faithbible.audiosearchapi.elasticsearch.repositories;
 
-import com.mattmartin.faithbible.audiosearchapi.models.SermonDocumentModel;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonDocumentModel;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.elasticsearch.annotations.Query;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
-
-import java.util.List;
 
 public interface SermonRepository extends ElasticsearchRepository<SermonDocumentModel, String> {
 

@@ -1,4 +1,4 @@
-package com.mattmartin.faithbible.audiosearchapi.models;
+package com.mattmartin.faithbible.audiosearchapi.elasticsearch.models;
 
 import java.util.Optional;
 

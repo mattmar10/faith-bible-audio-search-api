@@ -6,83 +6,45 @@ import com.mattmartin.faithbible.audiosearchapi.dtos.Sermon;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonDocumentModel;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonMediaModel;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.StatsModel;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.services.ESSeriesService;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.services.ESSermonService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class SermonControllerTest {
+public class SermonSearchControllerTest {
 
     @Mock
     ESSermonService esSermonService;
 
-    private SermonController sermonController;
+    @Mock
+    ESSeriesService esSeriesService;
+
+    private SermonSearchController sermonSearchController;
+    private SermonDocumentModel fathersDayModel;
+    private SermonDocumentModel fakeModel;
 
     @Before
     public void setup(){
         initMocks(this);
-        sermonController = new SermonController(esSermonService);
-    }
+        sermonSearchController = new SermonSearchController(esSermonService, esSeriesService);
 
-    @Test
-    public void testShouldReturn(){
-
-        final SermonMediaModel mediaModel =
-                new SermonMediaModel("http://edmondfaithbible.com/?page_id=2743&download&file_name=2015_0621%20Fathers%20Day%20MH-FBC%20SunAM.pdf",
-                        "http://edmondfaithbible.com/?page_id=2743&show&file_name=2015_0621%20Fathers%20Day%20Exodus%2020_12.mp3");
-
-        final StatsModel statsModel = new StatsModel(20, 3, 7);
-        Set<String> tags = new HashSet<>(Arrays.asList("tag1", "tag2"));
-
-        final SermonDocumentModel manual =
-                new SermonDocumentModel(
-                        "fakeId",
-                        "Exodus 20:12 How to Make Your Father's Day on Father's Day MH-FBC SunAM 6/21/2015",
-                        "http://edmondfaithbible.com/?page_id=2743&show&file_name=2015_0621%20Fathers%20Day%20Exodus%2020_12.mp3",
-                        "Dr Mark Hitchcock",
-                        FaithDateTimeFormatter.getLocalDate("2015-06-21"),
-                        "Father's Day",
-                        mediaModel,
-                        Optional.of("fathersDay123"),
-                        Optional.of(statsModel),
-                        Optional.of("https://s3.amazonaws.com/faith-bible-data/mp3-images/2014_0323+Revelation+3+1-6+The+Church+of+the+Walking+Dead.mp3.jpg"),
-                        Optional.of(tags));
-
-        when(esSermonService.findById("fakeId")).thenReturn(Optional.of(manual));
-
-        ResponseEntity<Sermon> response = sermonController.findById("fakeId");
-
-        assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
-        assertThat(response.getBody(), equalTo(Sermon.fromModel(manual)));
-    }
-
-    @Test
-    public void testShouldReturn404(){
-        when(esSermonService.findById("notFound")).thenReturn(Optional.empty());
-
-        ResponseEntity<Sermon> response = sermonController.findById("notFound");
-
-        assertThat(response.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
-    }
-
-    @Test
-    public void testMostRecent(){
         final SermonMediaModel mediaModel =
                 new SermonMediaModel("http://edmondfaithbible.com/?page_id=2743&download&file_name=2015_0621%20Fathers%20Day%20MH-FBC%20SunAM.pdf",
                         "http://edmondfaithbible.com/?page_id=2743&show&file_name=2015_0621%20Fathers%20Day%20Exodus%2020_12.mp3");
@@ -96,7 +58,8 @@ public class SermonControllerTest {
         Set<String> tags = new HashSet<>(Arrays.asList("tag1", "tag2"));
         Set<String> tags2 = new HashSet<>(Arrays.asList("tag3", "tag4"));
 
-        final SermonDocumentModel manual =
+
+        fathersDayModel=
                 new SermonDocumentModel(
                         "fakeId",
                         "Exodus 20:12 How to Make Your Father's Day on Father's Day MH-FBC SunAM 6/21/2015",
@@ -110,7 +73,7 @@ public class SermonControllerTest {
                         Optional.of("https://s3.amazonaws.com/faith-bible-data/mp3-images/2014_0323+Revelation+3+1-6+The+Church+of+the+Walking+Dead.mp3.jpg"),
                         Optional.of(tags));
 
-        final SermonDocumentModel manual2 =
+        fakeModel =
                 new SermonDocumentModel(
                         "fakeId2",
                         "Some title",
@@ -123,18 +86,65 @@ public class SermonControllerTest {
                         Optional.of(statsModel2),
                         Optional.empty(),
                         Optional.of(tags2));
+    }
+
+    @Test
+    public void testSearch(){
 
         final PageImpl<SermonDocumentModel> pageImpl =
                 new PageImpl<SermonDocumentModel>(
-                        Arrays.asList(new SermonDocumentModel[]{manual, manual2}),
+                        Arrays.asList(new SermonDocumentModel[]{fathersDayModel, fakeModel}),
                         PageRequest.of(0, 10), 2);
 
-        when(esSermonService.findMostRecent(2)).thenReturn(pageImpl);
-        ResponseEntity<Iterable<Sermon>> response = sermonController.findMostRecentSermons(2);
+        when(esSermonService.findByFreeSearch(
+                "FathersDay",
+                PageRequest.of(0, 10, Sort.Direction.DESC, "date"))).thenReturn(pageImpl);
+
+        ResponseEntity<Iterable<Sermon>> response = sermonSearchController.search("FathersDay", 0, 10);
 
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
-        assertTrue(Iterables.contains(response.getBody(), Sermon.fromModel(manual)));
-        assertTrue(Iterables.contains(response.getBody(), Sermon.fromModel(manual2)));
+        assertTrue(Iterables.contains(response.getBody(), Sermon.fromModel(fathersDayModel)));
+        assertTrue(Iterables.contains(response.getBody(), Sermon.fromModel(fakeModel)));
         assertThat(Iterables.size(response.getBody()), is(2));
+
     }
+
+    @Test
+    public void testSearchSeries(){
+
+        final PageImpl<SermonDocumentModel> pageImpl =
+                new PageImpl<SermonDocumentModel>(
+                        Arrays.asList(new SermonDocumentModel[]{fathersDayModel}),
+                        PageRequest.of(0, 10), 1);
+
+        when(esSermonService.findBySeries(
+                "Father's Day",
+                PageRequest.of(0, 10, Sort.Direction.DESC, "date"))).thenReturn(pageImpl);
+
+        ResponseEntity<Iterable<Sermon>> response = sermonSearchController.searchSeries("Father's Day", 0, 10);
+
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+        assertTrue(Iterables.contains(response.getBody(), Sermon.fromModel(fathersDayModel)));
+        assertThat(Iterables.size(response.getBody()), is(1));
+    }
+
+    @Test
+    public void testSearchSpeaker(){
+
+        final PageImpl<SermonDocumentModel> pageImpl =
+                new PageImpl<SermonDocumentModel>(
+                        Arrays.asList(new SermonDocumentModel[]{fathersDayModel}),
+                        PageRequest.of(0, 10), 1);
+
+        when(esSermonService.findBySpeaker(
+                "Dr Mark Hitchcock",
+                PageRequest.of(0, 10, Sort.Direction.DESC, "date"))).thenReturn(pageImpl);
+
+        ResponseEntity<Iterable<Sermon>> response = sermonSearchController.searchSpeaker("Dr Mark Hitchcock", 0, 10);
+
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+        assertTrue(Iterables.contains(response.getBody(), Sermon.fromModel(fathersDayModel)));
+        assertThat(Iterables.size(response.getBody()), is(1));
+    }
+
 }

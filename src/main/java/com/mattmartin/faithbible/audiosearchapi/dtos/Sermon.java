@@ -1,13 +1,13 @@
 package com.mattmartin.faithbible.audiosearchapi.dtos;
 
-import com.mattmartin.faithbible.audiosearchapi.models.SermonDocumentModel;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonDocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
-import java.net.URL;
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.Set;
 
 public class Sermon {
     private static final Logger logger = LoggerFactory.getLogger(Sermon.class);
@@ -16,12 +16,14 @@ public class Sermon {
     private String title;
     private String speaker;
     private String series;
+    private LocalDate date;
 
     private Optional<String> seriesLink;
-    private LocalDate date;
     private Optional<URI> mp3URI;
     private Optional<URI> imageURI;
     private Optional<URI> pdfURI;
+    private Optional<Stats> stats;
+    private Optional<Set<String>> tags;
 
     public static Sermon fromModel(final SermonDocumentModel documentModel) throws IllegalStateException{
         final String docId = documentModel.getId();
@@ -36,7 +38,13 @@ public class Sermon {
         final Optional<URI> pdfURI = documentModel.getMedia().getPdf().map(URI::create);
         final Optional<String> seriesLink = documentModel.getSeriesId().map(id -> "/series/" + id);
 
-        return new Sermon(docId, title, speaker, series, seriesLink, date, mp3URI, imageURI, pdfURI );
+        final Optional<Stats> stats =
+                documentModel.getStats().map(
+                        statsModel -> new Stats(statsModel.getPlays(), statsModel.getLikes(), statsModel.getShares()));
+
+        final Optional<Set<String>> tags = documentModel.getTags();
+
+        return new Sermon(docId, title, speaker, series, seriesLink, date, mp3URI, imageURI, pdfURI, stats, tags);
 
     }
 
@@ -48,7 +56,9 @@ public class Sermon {
                    final LocalDate date,
                    final Optional<URI> mp3URI,
                    final Optional<URI> imageURI,
-                   final Optional<URI> pdfURI ) {
+                   final Optional<URI> pdfURI,
+                   final Optional<Stats> stats,
+                    final Optional<Set<String>> tags) {
 
         this.id = id;
         this.title = title;
@@ -59,6 +69,8 @@ public class Sermon {
         this.mp3URI = mp3URI;
         this.imageURI = imageURI;
         this.pdfURI = pdfURI;
+        this.stats = stats;
+        this.tags = tags;
     }
 
     public String getId(){
@@ -135,6 +147,22 @@ public class Sermon {
         this.seriesLink = seriesLink;
     }
 
+    public Optional<Stats> getStats() {
+        return stats;
+    }
+
+    public void setStats(Optional<Stats> stats) {
+        this.stats = stats;
+    }
+
+    public Optional<Set<String>> getTags() {
+        return tags;
+    }
+
+    public void setTags(Optional<Set<String>> tags) {
+        this.tags = tags;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -176,6 +204,8 @@ public class Sermon {
         sb.append(", mp3URI=").append(mp3URI);
         sb.append(", pdfURI=").append(pdfURI);
         sb.append(", imageURI=").append(imageURI);
+        sb.append(", stats=").append(stats);
+        sb.append(", tags=").append(tags);
         sb.append('}');
         return sb.toString();
     }

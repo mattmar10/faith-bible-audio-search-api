@@ -1,17 +1,13 @@
-package com.mattmartin.faithbible.audiosearchapi.models;
+package com.mattmartin.faithbible.audiosearchapi.elasticsearch.models;
 
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import org.apache.tomcat.jni.Local;
+import com.mattmartin.faithbible.audiosearchapi.dtos.Stats;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Optional;
+import java.util.Set;
 
 
 @Document(indexName = "audio_data", type = "sermons")
@@ -30,12 +26,22 @@ public class SermonDocumentModel {
 
     private Optional<String> image;
     private SermonMediaModel media;
+    private Optional<StatsModel> stats;
+    private Optional<Set<String>> tags;
 
     public SermonDocumentModel(){}
 
-    public SermonDocumentModel(final String id, final String title, final String href, final String speaker,
-                               final LocalDate date, final String series, Optional<String> seriesId,
-                               final Optional<String> image, final SermonMediaModel media) {
+    public SermonDocumentModel(final String id,
+                               final String title,
+                               final String href,
+                               final String speaker,
+                               final LocalDate date,
+                               final String series,
+                               final SermonMediaModel media,
+                               final Optional<String> seriesId,
+                               final Optional<StatsModel> stats,
+                               final Optional<String> image,
+                               final Optional<Set<String>> tags) {
         this.id = id;
         this.title = title;
         this.href = href;
@@ -45,6 +51,8 @@ public class SermonDocumentModel {
         this.media = media;
         this.image = image;
         this.seriesId = seriesId;
+        this.stats = stats;
+        this.tags = tags;
     }
 
     public String getId() {
@@ -115,6 +123,21 @@ public class SermonDocumentModel {
         this.seriesId = seriesId;
     }
 
+    public Optional<StatsModel> getStats() {
+        return stats;
+    }
+
+    public void setStats(Optional<StatsModel> stats) {
+        this.stats = stats;
+    }
+    public Optional<Set<String>> getTags() {
+        return tags;
+    }
+
+    public void setTags(Optional<Set<String>> tags) {
+        this.tags = tags;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -141,6 +164,8 @@ public class SermonDocumentModel {
                 ", series='" + series + '\'' +
                 ", seriesId='" + seriesId + '\'' +
                 ", media=" + media +
+                ", stats='" + stats + '\'' +
+                ", tags='" + tags + '\'' +
                 '}';
     }
 }

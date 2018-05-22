@@ -3,10 +3,9 @@ package com.mattmartin.faithbible.audiosearchapi.json;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mattmartin.faithbible.audiosearchapi.config.FaithDateTimeFormatter;
 import com.mattmartin.faithbible.audiosearchapi.config.JacksonConfiguration;
-import com.mattmartin.faithbible.audiosearchapi.dtos.Sermon;
-import com.mattmartin.faithbible.audiosearchapi.models.SermonDocumentModel;
-import com.mattmartin.faithbible.audiosearchapi.models.SermonMediaModel;
-import net.minidev.json.JSONValue;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonDocumentModel;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonMediaModel;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.StatsModel;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -14,7 +13,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 public class SermonDocumentModelJsonTest {
 
@@ -28,6 +30,8 @@ public class SermonDocumentModelJsonTest {
                 "        \"serviceDay\": \"Sunday Morning\",\n" +
                 "        \"date\": \"2015-06-21T00:00:00\",\n" +
                 "        \"series\": \"Father's Day\",\n" +
+                "        \"stats\": {\"plays\": 3, \"likes\": 5, \"shares\": 7},\n" +
+                "        \"tags\": [\"Fathers Day\", \"Exodus\"],\n" +
                 "        \"media\": {\n" +
                 "            \"pdf\": \"http://edmondfaithbible.com/?page_id=2743&download&file_name=2015_0621%20Fathers%20Day%20MH-FBC%20SunAM.pdf\",\n" +
                 "            \"mp3\": \"http://edmondfaithbible.com/?page_id=2743&show&file_name=2015_0621%20Fathers%20Day%20Exodus%2020_12.mp3\"\n" +
@@ -41,6 +45,8 @@ public class SermonDocumentModelJsonTest {
                 new SermonMediaModel("http://edmondfaithbible.com/?page_id=2743&download&file_name=2015_0621%20Fathers%20Day%20MH-FBC%20SunAM.pdf",
                         "http://edmondfaithbible.com/?page_id=2743&show&file_name=2015_0621%20Fathers%20Day%20Exodus%2020_12.mp3");
 
+        final StatsModel statsModel = new StatsModel(3, 5, 7);
+        final Set<String> tags = new HashSet<>(Arrays.asList("Fathers Day", "Exodus"));
         final SermonDocumentModel manual =
                 new SermonDocumentModel(
                         "fakeId",
@@ -49,12 +55,21 @@ public class SermonDocumentModelJsonTest {
                         "Dr Mark Hitchcock",
                         FaithDateTimeFormatter.getLocalDate("2015-06-21"),
                         "Father's Day",
+                        mediaModel,
                         Optional.of("fathersDay123"),
+                        Optional.of(statsModel),
                         Optional.empty(),
-                        mediaModel);
+                        Optional.of(tags));
 
         assertThat(parsed, equalTo(manual));
         assertThat(parsed.hashCode(), equalTo(manual.hashCode()));
         assertThat(parsed.hashCode(), equalTo(manual.hashCode()));
+        assertThat(parsed.getTags().get(), equalTo(tags));
+        StatsModel stats = parsed.getStats().get();
+
+        assertThat(stats.getPlays().get(), is(3));
+        assertThat(stats.getLikes().get(), is(5));
+        assertThat(stats.getShares().get(), is(7));
+
     }
 }

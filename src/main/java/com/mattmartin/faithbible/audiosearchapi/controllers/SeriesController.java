@@ -1,17 +1,14 @@
 package com.mattmartin.faithbible.audiosearchapi.controllers;
 
 import com.mattmartin.faithbible.audiosearchapi.dtos.Series;
-import com.mattmartin.faithbible.audiosearchapi.dtos.Sermon;
-import com.mattmartin.faithbible.audiosearchapi.models.SeriesModel;
-import com.mattmartin.faithbible.audiosearchapi.models.SermonDocumentModel;
-import com.mattmartin.faithbible.audiosearchapi.services.ESSeriesService;
-import com.mattmartin.faithbible.audiosearchapi.services.ESSermonService;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SeriesModel;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.services.ESSeriesService;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.services.ESSermonService;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

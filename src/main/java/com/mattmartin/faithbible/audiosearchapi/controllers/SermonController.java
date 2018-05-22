@@ -1,8 +1,8 @@
 package com.mattmartin.faithbible.audiosearchapi.controllers;
 
 import com.mattmartin.faithbible.audiosearchapi.dtos.Sermon;
-import com.mattmartin.faithbible.audiosearchapi.models.SermonDocumentModel;
-import com.mattmartin.faithbible.audiosearchapi.services.ESSermonService;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonDocumentModel;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.services.ESSermonService;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;

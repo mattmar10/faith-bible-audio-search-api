@@ -1,4 +1,4 @@
-package com.mattmartin.faithbible.audiosearchapi.models;
+package com.mattmartin.faithbible.audiosearchapi.elasticsearch.models;
 
 public class AudioJsonSource {
 

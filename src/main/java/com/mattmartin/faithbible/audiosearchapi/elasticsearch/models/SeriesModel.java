@@ -1,7 +1,6 @@
-package com.mattmartin.faithbible.audiosearchapi.models;
+package com.mattmartin.faithbible.audiosearchapi.elasticsearch.models;
 
 
-import com.mattmartin.faithbible.audiosearchapi.dtos.Sermon;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
@@ -9,7 +8,6 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,36 +17,43 @@ public class SeriesModel {
     @Id
     private String id;
     private String title;
-
+    private Optional<StatsModel> stats;
     private Optional<URI> imageURI;
 
     @Field(type = FieldType.Nested)
     private List<SermonDocumentModel> sermons;
 
-
-   public static SeriesModel fromSermon(final SermonDocumentModel documentModel){
+   /*public static SeriesModel fromSermon(final SermonDocumentModel documentModel){
         final String title = documentModel.getSeries();
         final Optional<URI> imageURI = (documentModel.getImage().isPresent()) ?
                 Optional.of(URI.create(documentModel.getImage().get())) :
                 Optional.empty();
 
         return new SeriesModel(documentModel.getSeriesId().orElseGet(null), title, imageURI, Arrays.asList(documentModel));
-    }
+    }*/
 
     public SeriesModel(){}
 
-    public SeriesModel(final String id, final String title, final Optional<URI> imageURI){
+    public SeriesModel(final String id,
+                       final String title,
+                       final Optional<URI> imageURI){
         this.title = title;
         this.imageURI = imageURI;
         this.id = id;
         this.sermons = new ArrayList<>();
+        this.stats = Optional.empty();
     }
 
-    public SeriesModel(final String id, final String title, final Optional<URI> imageURI, List<SermonDocumentModel> sermons){
+    public SeriesModel(final String id,
+                       final String title,
+                       final List<SermonDocumentModel> sermons,
+                       final Optional<URI> imageURI,
+                       final Optional<StatsModel> stats){
         this.title = title;
         this.imageURI = imageURI;
         this.id = id;
         this.sermons = new ArrayList<SermonDocumentModel>(sermons);
+        this.stats = stats;
     }
 
     public String getId() {
@@ -88,6 +93,14 @@ public class SeriesModel {
         return this.sermons.add(sermonDocumentModel);
     }
 
+    public Optional<StatsModel> getStats() {
+        return stats;
+    }
+
+    public void setStats(Optional<StatsModel> stats) {
+        this.stats = stats;
+    }
+
     public boolean removeSermon(final SermonDocumentModel sermonDocumentModel){
        return this.sermons.remove(sermonDocumentModel);
     }
@@ -114,6 +127,7 @@ public class SeriesModel {
         sb.append("id='").append(id).append('\'');
         sb.append("title='").append(title).append('\'');
         sb.append(", imageURI=").append(imageURI);
+        sb.append(", status=").append(stats);
         sb.append('}');
         return sb.toString();
     }

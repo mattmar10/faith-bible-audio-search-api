@@ -1,10 +1,10 @@
-package com.mattmartin.faithbible.audiosearchapi.services;
+package com.mattmartin.faithbible.audiosearchapi.elasticsearch.services;
 
 import com.github.vanroy.springdata.jest.JestElasticsearchTemplate;
-import com.mattmartin.faithbible.audiosearchapi.models.SeriesModel;
-import com.mattmartin.faithbible.audiosearchapi.models.SermonDocumentModel;
-import com.mattmartin.faithbible.audiosearchapi.repositories.SeriesRepository;
-import com.mattmartin.faithbible.audiosearchapi.repositories.SermonRepository;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SeriesModel;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonDocumentModel;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.repositories.SeriesRepository;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.repositories.SermonRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
