@@ -1,10 +1,20 @@
+flyway:
+  baseline-on-migrate: true
+  schemas: fbc_media
+
 spring:
   profiles:
     active: "local"
   jackson:
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: false
-
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database: postgresql
+    properties:
+        hibernate:
+          default_schema: fbc_media
+          dialect: com.mattmartin.faithbible.audiosearchapi.db.config.JSONPostgresSQLDialect
 
 ---
 
@@ -15,6 +25,12 @@ spring:
       properties:
         path.home: target/elastic
         transport.tcp.connect_timeout: 120s
+  datasource:
+    platform: postgres
+    url: jdbc:postgresql://localhost:5432/fbc_media_data
+    username: fbc_svc_user
+    password: devpassword
+    driver-class-name: org.postgresql.Driver
 
 ---
 
