@@ -93,6 +93,8 @@ public class Series {
         sb.append("id='").append(id).append('\'');
         sb.append("title='").append(title).append('\'');
         sb.append(", imageURI=").append(imageURI);
+        sb.append(", stats=").append(stats);
+        sb.append(", tags=").append(tags);
         sb.append('}');
         return sb.toString();
     }

@@ -128,6 +128,7 @@ public class SeriesModel {
         sb.append("title='").append(title).append('\'');
         sb.append(", imageURI=").append(imageURI);
         sb.append(", status=").append(stats);
+        sb.append(", tags=").append(imageURI);
         sb.append('}');
         return sb.toString();
     }
