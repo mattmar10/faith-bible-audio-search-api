@@ -23,7 +23,7 @@ public class SermonDocumentModelJsonTest {
     @Test
     public void testParsing() throws IOException {
         final String json = "{\n" +
-                "        \"id\": \"fakeId\",\n" +
+                "        \"id\": 5,\n" +
                 "        \"title\": \"Exodus 20:12 How to Make Your Father's Day on Father's Day MH-FBC SunAM 6/21/2015\",\n" +
                 "        \"href\": \"http://edmondfaithbible.com/?page_id=2743&show&file_name=2015_0621%20Fathers%20Day%20Exodus%2020_12.mp3\",\n" +
                 "        \"speaker\": \"Dr Mark Hitchcock\",\n" +
@@ -49,14 +49,15 @@ public class SermonDocumentModelJsonTest {
         final Set<String> tags = new HashSet<>(Arrays.asList("Fathers Day", "Exodus"));
         final SermonDocumentModel manual =
                 new SermonDocumentModel(
-                        "fakeId",
+                        5,
                         "Exodus 20:12 How to Make Your Father's Day on Father's Day MH-FBC SunAM 6/21/2015",
+                        "slug",
                         "http://edmondfaithbible.com/?page_id=2743&show&file_name=2015_0621%20Fathers%20Day%20Exodus%2020_12.mp3",
                         "Dr Mark Hitchcock",
                         FaithDateTimeFormatter.getLocalDate("2015-06-21"),
                         "Father's Day",
                         mediaModel,
-                        Optional.of("fathersDay123"),
+                        Optional.of(5),
                         Optional.of(statsModel),
                         Optional.empty(),
                         Optional.of(tags));

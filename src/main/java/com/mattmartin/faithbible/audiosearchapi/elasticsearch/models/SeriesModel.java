@@ -10,23 +10,26 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
-@Document(indexName = "audio_data", type = "series")
+@Document(indexName = "series")
 public class SeriesModel {
 
     @Id
-    private String id;
+    private Integer id;
     private String title;
+    private String slug;
     private Optional<StatsModel> stats;
     private Optional<URI> imageURI;
+    private Optional<Set<String>> tags;
 
     @Field(type = FieldType.Nested)
     private List<SermonDocumentModel> sermons;
 
    /*public static SeriesModel fromSermon(final SermonDocumentModel documentModel){
         final String title = documentModel.getSeries();
-        final Optional<URI> imageURI = (documentModel.getImage().isPresent()) ?
-                Optional.of(URI.create(documentModel.getImage().get())) :
+        final Optional<URI> imageURI = (documentModel.getImageUrl().isPresent()) ?
+                Optional.of(URI.create(documentModel.getImageUrl().get())) :
                 Optional.empty();
 
         return new SeriesModel(documentModel.getSeriesId().orElseGet(null), title, imageURI, Arrays.asList(documentModel));
@@ -34,33 +37,41 @@ public class SeriesModel {
 
     public SeriesModel(){}
 
-    public SeriesModel(final String id,
+    public SeriesModel(final Integer id,
                        final String title,
-                       final Optional<URI> imageURI){
+                       final String slug,
+                       final Optional<URI> imageURI,
+                       final Optional<Set<String>> tags){
         this.title = title;
+        this.slug = slug;
         this.imageURI = imageURI;
         this.id = id;
         this.sermons = new ArrayList<>();
         this.stats = Optional.empty();
+        this.tags = tags;
     }
 
-    public SeriesModel(final String id,
+    public SeriesModel(final Integer id,
                        final String title,
+                       final String slug,
                        final List<SermonDocumentModel> sermons,
                        final Optional<URI> imageURI,
-                       final Optional<StatsModel> stats){
+                       final Optional<StatsModel> stats,
+                       final Optional<Set<String>> tags){
         this.title = title;
+        this.slug = slug;
         this.imageURI = imageURI;
         this.id = id;
         this.sermons = new ArrayList<SermonDocumentModel>(sermons);
         this.stats = stats;
+        this.tags = tags;
     }
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -105,6 +116,22 @@ public class SeriesModel {
        return this.sermons.remove(sermonDocumentModel);
     }
 
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
+
+    public Optional<Set<String>> getTags() {
+        return tags;
+    }
+
+    public void setTags(Optional<Set<String>> tags) {
+        this.tags = tags;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -128,7 +155,7 @@ public class SeriesModel {
         sb.append("title='").append(title).append('\'');
         sb.append(", imageURI=").append(imageURI);
         sb.append(", status=").append(stats);
-        sb.append(", tags=").append(imageURI);
+        sb.append(", slug=").append(slug);
         sb.append('}');
         return sb.toString();
     }

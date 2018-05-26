@@ -10,19 +10,20 @@ import java.util.Optional;
 import java.util.Set;
 
 
-@Document(indexName = "audio_data", type = "sermons")
+@Document(indexName = "sermons")
 public class SermonDocumentModel {
 
     @Id
-    private String id;
+    private Integer id;
 
     private String title;
+    private String slug;
     private String href;
     private String speaker;
     private LocalDate date;
 
     private String series;
-    private Optional<String> seriesId;
+    private Optional<Integer> seriesId;
 
     private Optional<String> image;
     private SermonMediaModel media;
@@ -31,19 +32,21 @@ public class SermonDocumentModel {
 
     public SermonDocumentModel(){}
 
-    public SermonDocumentModel(final String id,
+    public SermonDocumentModel(final Integer id,
                                final String title,
+                               final String slug,
                                final String href,
                                final String speaker,
                                final LocalDate date,
                                final String series,
                                final SermonMediaModel media,
-                               final Optional<String> seriesId,
+                               final Optional<Integer> seriesId,
                                final Optional<StatsModel> stats,
                                final Optional<String> image,
                                final Optional<Set<String>> tags) {
         this.id = id;
         this.title = title;
+        this.slug = slug;
         this.href = href;
         this.speaker = speaker;
         this.date = date;
@@ -55,11 +58,11 @@ public class SermonDocumentModel {
         this.tags = tags;
     }
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -115,11 +118,11 @@ public class SermonDocumentModel {
 
     public Optional<String> getImage(){ return this.image; };
 
-    public Optional<String> getSeriesId() {
+    public Optional<Integer> getSeriesId() {
         return seriesId;
     }
 
-    public void setSeriesId(Optional<String> seriesId) {
+    public void setSeriesId(Optional<Integer> seriesId) {
         this.seriesId = seriesId;
     }
 
@@ -136,6 +139,14 @@ public class SermonDocumentModel {
 
     public void setTags(Optional<Set<String>> tags) {
         this.tags = tags;
+    }
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
     }
 
     @Override
@@ -158,11 +169,13 @@ public class SermonDocumentModel {
         return "SermonDocumentModel{" +
                 "id='" + id + '\'' +
                 ", title='" + title + '\'' +
-                ", href='" + href + '\'' +
+                ", slug='" + slug + '\'' +
+                ", img='" + image + '\'' +
                 ", speaker='" + speaker + '\'' +
                 ", date=" + date +
                 ", series='" + series + '\'' +
                 ", seriesId='" + seriesId + '\'' +
+                ", slug='" + slug + '\'' +
                 ", media=" + media +
                 ", stats='" + stats + '\'' +
                 ", tags='" + tags + '\'' +

@@ -12,8 +12,8 @@ public class SermonMediaModel {
     public SermonMediaModel(final String pdf, final String mp3) throws IllegalArgumentException{
 
 
-        this.pdf = Optional.of(pdf);
-        this.mp3 = Optional.of(mp3);
+        this.pdf = Optional.ofNullable(pdf);
+        this.mp3 = Optional.ofNullable(mp3);
     }
 
     public Optional<String> getPdf() {

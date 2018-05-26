@@ -2,7 +2,7 @@ package com.mattmartin.faithbible.audiosearchapi.elasticsearch.services;
 
 import com.github.vanroy.springdata.jest.JestElasticsearchTemplate;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonDocumentModel;
-import com.mattmartin.faithbible.audiosearchapi.elasticsearch.repositories.SermonRepository;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.repositories.ESSermonRepository;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,28 +26,32 @@ public class ESSermonService{
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final SermonRepository sermonRepository;
+    private final ESSermonRepository eSSermonRepository;
     private final JestElasticsearchTemplate elasticsearchTemplate;
 
     @Autowired
-    public ESSermonService(final SermonRepository repo, final JestElasticsearchTemplate elasticsearchTemplate){
-        this.sermonRepository = repo;
+    public ESSermonService(final ESSermonRepository ESSermonRepository, final JestElasticsearchTemplate elasticsearchTemplate){
+        this.eSSermonRepository = ESSermonRepository;
         this.elasticsearchTemplate = elasticsearchTemplate;
     }
 
     public SermonDocumentModel save(final SermonDocumentModel sermon) {
         logger.info(String.format("Persisting sermon [%s].", sermon));
-        return sermonRepository.save(sermon);
+        return eSSermonRepository.save(sermon);
     }
 
     public void delete(final SermonDocumentModel sermonDocumentModel) {
         logger.info(String.format("Deleting sermon [%s].", sermonDocumentModel));
-        sermonRepository.delete(sermonDocumentModel);
+        eSSermonRepository.delete(sermonDocumentModel);
+    }
+
+    public void deleteAll(){
+        eSSermonRepository.deleteAll();
     }
 
     public Page<SermonDocumentModel> findBySpeaker(final String speaker, final PageRequest pageRequest) {
         logger.info(String.format("Searching for sermons by speaker [%s].", speaker));
-        return sermonRepository.findBySpeaker(speaker, pageRequest);
+        return eSSermonRepository.findBySpeaker(speaker, pageRequest);
     }
 
 
@@ -59,12 +63,12 @@ public class ESSermonService{
                 .withPageable(pageRequest)
                 .build();
 
-        return sermonRepository.search(query);
+        return eSSermonRepository.search(query);
     }
 
-    public Optional<SermonDocumentModel>findById(final String id){
+    public Optional<SermonDocumentModel>findById(final Integer id){
         logger.info(String.format("Fetching details for sermon [%s].", id));
-        return sermonRepository.findById(id);
+        return eSSermonRepository.findById(id);
     }
 
     public Page<SermonDocumentModel> findByFreeSearch(final String query, final PageRequest pageRequest) {
@@ -80,7 +84,7 @@ public class ESSermonService{
                 .withPageable(pageRequest)
                 .build();
 
-        return sermonRepository.search(searchQuery);
+        return eSSermonRepository.search(searchQuery);
     }
 
     public Page<SermonDocumentModel> findMostRecent(final int count) {
@@ -89,7 +93,7 @@ public class ESSermonService{
         final SearchQuery searchQuery = new NativeSearchQueryBuilder()
                 .withQuery(matchAllQuery()).withPageable(PageRequest.of(0, count, Sort.Direction.DESC, "date")).build();
 
-        return sermonRepository.search(searchQuery);
+        return eSSermonRepository.search(searchQuery);
     }
 
 }

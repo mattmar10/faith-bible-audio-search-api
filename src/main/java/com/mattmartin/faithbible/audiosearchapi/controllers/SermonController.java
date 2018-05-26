@@ -1,8 +1,11 @@
 package com.mattmartin.faithbible.audiosearchapi.controllers;
 
+import com.mattmartin.faithbible.audiosearchapi.db.models.SermonDBModel;
 import com.mattmartin.faithbible.audiosearchapi.dtos.Sermon;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonDocumentModel;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.services.ESSermonService;
+import com.mattmartin.faithbible.audiosearchapi.http.FBCApiResponse;
+import com.mattmartin.faithbible.audiosearchapi.services.SermonsService;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
@@ -27,10 +30,14 @@ public class SermonController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final ESSermonService searchService;
+    private final SermonsService sermonsService;
 
     @Autowired
-    public SermonController(final ESSermonService sService){
+    public SermonController(final ESSermonService sService,
+                            final SermonsService sermonsService)
+    {
         this.searchService = sService;
+        this.sermonsService = sermonsService;
     }
 
     @ResponseStatus(OK)
@@ -41,11 +48,14 @@ public class SermonController {
     @RequestMapping(method = RequestMethod.GET,
             value = "/sermon/{id}",
             produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Sermon> findById(@PathVariable("id") String id){
-        final Optional<SermonDocumentModel> sermonMaybe = searchService.findById(id);
+    public ResponseEntity<FBCApiResponse<Sermon>> findById(@PathVariable("id") Integer id){
+        final Optional<SermonDBModel> sermonMaybe = sermonsService.findById(id);
 
         if(sermonMaybe.isPresent()){
-            return new ResponseEntity<Sermon>(Sermon.fromModel(sermonMaybe.get()), HttpStatus.OK);
+            final FBCApiResponse<Sermon> response =
+                    new FBCApiResponse<Sermon>(Sermon.fromDBModel(sermonMaybe.get()), HttpStatus.OK);
+            return new ResponseEntity<>(response, response.getStatusCode());
+
         }
         else{
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -78,5 +88,6 @@ public class SermonController {
         }
 
     }
+
 
 }

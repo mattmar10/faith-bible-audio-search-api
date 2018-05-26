@@ -3,8 +3,8 @@ package com.mattmartin.faithbible.audiosearchapi.elasticsearch.services;
 import com.github.vanroy.springdata.jest.JestElasticsearchTemplate;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SeriesModel;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonDocumentModel;
-import com.mattmartin.faithbible.audiosearchapi.elasticsearch.repositories.SeriesRepository;
-import com.mattmartin.faithbible.audiosearchapi.elasticsearch.repositories.SermonRepository;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.repositories.ESSeriesRepository;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.repositories.ESSermonRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,28 +27,32 @@ public class ESSeriesService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final SeriesRepository seriesRepository;
-    private final SermonRepository sermonRepository;
+    private final ESSeriesRepository esSeriesRepository;
+    private final ESSermonRepository esSermonRepository;
     private final JestElasticsearchTemplate elasticsearchTemplate;
 
     @Autowired
-    public ESSeriesService(final SeriesRepository repo,
-                           final SermonRepository sermonRepository,
+    public ESSeriesService(final ESSeriesRepository repo,
+                           final ESSermonRepository ESSermonRepository,
                            final JestElasticsearchTemplate elasticsearchTemplate){
 
-        this.seriesRepository = repo;
+        this.esSeriesRepository = repo;
         this.elasticsearchTemplate = elasticsearchTemplate;
-        this.sermonRepository = sermonRepository;
+        this.esSermonRepository = ESSermonRepository;
+    }
+
+    public void deleteAll(){
+        esSeriesRepository.deleteAll();
     }
 
     public SeriesModel save(final SeriesModel seriesModel) {
         logger.info(String.format("Persisting series [%s].", seriesModel));
-        return seriesRepository.save(seriesModel);
+        return esSeriesRepository.save(seriesModel);
     }
 
-    public Optional<SeriesModel> findById(final String id){
+    public Optional<SeriesModel> findById(final int id){
         logger.info(String.format("Fetching details for series [%s].", id));
-        return seriesRepository.findById(id).map(s -> validateSeriesSermons(s));
+        return esSeriesRepository.findById(id).map(s -> validateSeriesSermons(s));
     }
 
     public List<SeriesModel> findMostRecentSeries(final int count){
@@ -57,12 +61,12 @@ public class ESSeriesService {
                 .withPageable(PageRequest.of(0, 200, Sort.Direction.DESC, "date"))
                 .build();
 
-        final Page<SermonDocumentModel> results = sermonRepository.search(searchQuery);
+        final Page<SermonDocumentModel> results = esSermonRepository.search(searchQuery);
 
         final List<SeriesModel> seriesSet = new ArrayList<>();
         for(SermonDocumentModel documentModel: results){
             documentModel.getSeriesId().ifPresent(seriesId -> {
-                final Optional<SeriesModel> series = seriesRepository.findById(seriesId);
+                final Optional<SeriesModel> series = esSeriesRepository.findById(seriesId);
 
                 series.ifPresent(s -> {
                     if(!seriesSet.contains(s)){

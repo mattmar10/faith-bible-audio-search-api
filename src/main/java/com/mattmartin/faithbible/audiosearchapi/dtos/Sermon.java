@@ -1,19 +1,23 @@
 package com.mattmartin.faithbible.audiosearchapi.dtos;
 
+import com.mattmartin.faithbible.audiosearchapi.db.models.SermonDBModel;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonDocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 public class Sermon {
     private static final Logger logger = LoggerFactory.getLogger(Sermon.class);
 
-    private String id;
+    private Integer id;
     private String title;
+    private String slug;
     private String speaker;
     private String series;
     private LocalDate date;
@@ -26,10 +30,11 @@ public class Sermon {
     private Optional<Set<String>> tags;
 
     public static Sermon fromModel(final SermonDocumentModel documentModel) throws IllegalStateException{
-        final String docId = documentModel.getId();
+        final Integer docId = documentModel.getId();
         final String title = documentModel.getTitle().contains("(") ?
                 documentModel.getTitle().substring(0, documentModel.getTitle().indexOf("(") - 1) :
                 documentModel.getTitle();
+        final String slug = documentModel.getSlug();
         final String speaker = documentModel.getSpeaker();
         final String series = documentModel.getSeries();
         final LocalDate date = documentModel.getDate();
@@ -44,12 +49,36 @@ public class Sermon {
 
         final Optional<Set<String>> tags = documentModel.getTags();
 
-        return new Sermon(docId, title, speaker, series, seriesLink, date, mp3URI, imageURI, pdfURI, stats, tags);
+        return new Sermon(docId, title, slug, speaker, series, seriesLink, date, mp3URI, imageURI, pdfURI, stats, tags);
 
     }
 
-    private Sermon( final String id,
+    public static Sermon fromDBModel(final SermonDBModel sermonDBModel){
+        final int id = sermonDBModel.getId();
+        final String title = sermonDBModel.getTitle();
+        final String slug = sermonDBModel.getSlug();
+        final String speaker = sermonDBModel.getSpeaker();
+        final String series = sermonDBModel.getSeries().getTitle();
+        final LocalDate date = sermonDBModel.getDate();
+        final String seriesLink = "/series/" + sermonDBModel.getSeries().getId();
+
+        final Optional<URI> mp3URI = Optional.ofNullable(sermonDBModel.getMp3Url()).map(URI::create);
+        final Optional<URI> imageURI = Optional.ofNullable(sermonDBModel.getImageUrl()).map(URI::create);
+        final Optional<URI> pdfURI = Optional.ofNullable(sermonDBModel.getPdfUrl()).map(URI::create);
+
+
+        final Stats stats = new Stats(sermonDBModel.getPlays(), sermonDBModel.getLikes(), sermonDBModel.getShares());
+
+        final Optional<List<String>> tags = Optional.ofNullable(sermonDBModel.getTags());
+
+        final Optional<Set<String>> tagSet = tags.map(list -> new HashSet(list));
+
+        return new Sermon(id, title, slug, speaker, series, Optional.of(seriesLink), date, mp3URI, imageURI, pdfURI, Optional.of(stats), tagSet);
+    }
+
+    private Sermon( final Integer id,
                    final String title,
+                   final String slug,
                    final String speaker,
                    final String series,
                    final Optional<String> seriesLink,
@@ -62,6 +91,7 @@ public class Sermon {
 
         this.id = id;
         this.title = title;
+        this.slug = slug;
         this.speaker = speaker;
         this.series = series;
         this.seriesLink = seriesLink;
@@ -73,11 +103,11 @@ public class Sermon {
         this.tags = tags;
     }
 
-    public String getId(){
+    public Integer getId(){
         return this.id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -163,6 +193,14 @@ public class Sermon {
         this.tags = tags;
     }
 
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -200,6 +238,7 @@ public class Sermon {
         sb.append(", title='").append(title).append('\'');
         sb.append(", speaker='").append(speaker).append('\'');
         sb.append(", series='").append(series).append('\'');
+        sb.append(", slug='").append(slug).append('\'');
         sb.append(", date=").append(date);
         sb.append(", mp3URI=").append(mp3URI);
         sb.append(", pdfURI=").append(pdfURI);

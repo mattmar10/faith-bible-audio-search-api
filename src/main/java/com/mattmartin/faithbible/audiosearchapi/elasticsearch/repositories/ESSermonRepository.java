@@ -4,13 +4,13 @@ import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonDocum
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
+import org.springframework.stereotype.Repository;
 
-public interface SermonRepository extends ElasticsearchRepository<SermonDocumentModel, String> {
+@Repository
+public interface ESSermonRepository extends ElasticsearchRepository<SermonDocumentModel, Integer> {
 
     Page<SermonDocumentModel> findBySeries(final String series, final Pageable pageable);
 
     Page<SermonDocumentModel> findBySpeaker(final String speaker, final Pageable pageable);
-
-
 
 }

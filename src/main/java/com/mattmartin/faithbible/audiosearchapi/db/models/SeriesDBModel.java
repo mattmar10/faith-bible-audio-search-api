@@ -1,46 +1,36 @@
 package com.mattmartin.faithbible.audiosearchapi.db.models;
 
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mattmartin.faithbible.audiosearchapi.db.config.StringListJsonUserType;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
-import com.mattmartin.faithbible.audiosearchapi.db.config.StringListJsonUserType;
+
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "sermons", schema = "fbc_media")
+@Table(name = "series", schema = "fbc_media")
 @TypeDef(name = "StringListJsonUserType", typeClass = StringListJsonUserType.class)
-public class SermonDBModel  {
+public class SeriesDBModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="sermon_id")
+    @Column (name="series_id")
     private Integer id;
 
     @Column(nullable = false)
     private String title;
 
-    @Column(name = "mp3_url")
-    private String mp3Url;
-
-    @Column(name = "pdf_url")
-    private String pdfUrl;
-
-    @Column(name = "video_url")
-    private String videoUrl;
-
-    @Column private String speaker;
-
-    @Column private LocalDate date;
-
-    @Column(name="image_url")
-    private String imageUrl;
-
     @Column(nullable = false)
     private String slug;
+
+    @Column(name="image_url")
+    private String imageURL;
 
     @Column private Integer likes;
     @Column private Integer shares;
@@ -58,30 +48,20 @@ public class SermonDBModel  {
     private String lastUpdatedBy;
 
     @Column(name = "last_updated_date")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DBModelUtils.DATE_FORMAT )
     private LocalDate lastUpdatedDate;
 
-    @ManyToOne
-    @JoinColumn(name="series_id", nullable = false)
-    private SeriesDBModel series;
+    @JoinColumn(name="series_id")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true )
+    private List<SermonDBModel> sermons = new ArrayList<>();
 
+    public SeriesDBModel(){}
 
-    public SermonDBModel(){}
-
-    public Integer getId(){
-        return this.id;
+    public Integer getId() {
+        return id;
     }
 
-    public void setId(Integer id){
+    public void setId(Integer id) {
         this.id = id;
-    }
-
-    public String getVideoUrl() {
-        return videoUrl;
-    }
-
-    public void setVideoUrl(String videoUrl) {
-        this.videoUrl = videoUrl;
     }
 
     public String getTitle() {
@@ -92,36 +72,12 @@ public class SermonDBModel  {
         this.title = title;
     }
 
-    public String getMp3Url() {
-        return mp3Url;
+    public String getImageURL() {
+        return imageURL;
     }
 
-    public void setMp3Url(String mp3Url) {
-        this.mp3Url = mp3Url;
-    }
-
-    public String getSpeaker() {
-        return speaker;
-    }
-
-    public void setSpeaker(String speaker) {
-        this.speaker = speaker;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
     }
 
     public Integer getLikes() {
@@ -188,20 +144,13 @@ public class SermonDBModel  {
         this.lastUpdatedDate = lastUpdatedDate;
     }
 
-    public SeriesDBModel getSeries() {
-        return series;
+    public List<SermonDBModel> getSermons() {
+        return sermons;
     }
 
-    public void setSeries(SeriesDBModel series) {
-        this.series = series;
-    }
-
-    public String getPdfUrl() {
-        return pdfUrl;
-    }
-
-    public void setPdfUrl(String pdfUrl) {
-        this.pdfUrl = pdfUrl;
+    public void setSermons(List<SermonDBModel> sermons) {
+        sermons.forEach(s -> s.setSeries(this));
+        this.sermons = sermons;
     }
 
     public String getSlug() {
@@ -217,15 +166,14 @@ public class SermonDBModel  {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        SermonDBModel that = (SermonDBModel) o;
+        SeriesDBModel that = (SeriesDBModel) o;
 
         if (!id.equals(that.id)) return false;
         if (!title.equals(that.title)) return false;
         if (!slug.equals(that.slug)) return false;
-        if (!speaker.equals(that.speaker)) return false;
-        if (!date.equals(that.date)) return false;
-        if (imageUrl != null ? !imageUrl.equals(that.imageUrl) : that.imageUrl != null) return false;
-        return series.equals(that.series);
+        if (imageURL != null ? !imageURL.equals(that.imageURL) : that.imageURL != null) return false;
+        if (!mapped.equals(that.mapped)) return false;
+        return sermons.equals(that.sermons);
     }
 
     @Override
@@ -233,25 +181,19 @@ public class SermonDBModel  {
         int result = id.hashCode();
         result = 31 * result + title.hashCode();
         result = 31 * result + slug.hashCode();
-        result = 31 * result + speaker.hashCode();
-        result = 31 * result + date.hashCode();
-        result = 31 * result + (imageUrl != null ? imageUrl.hashCode() : 0);
-        result = 31 * result + series.hashCode();
+        result = 31 * result + (imageURL != null ? imageURL.hashCode() : 0);
+        result = 31 * result + mapped.hashCode();
+        result = 31 * result + sermons.hashCode();
         return result;
     }
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("SermonDBModel{");
+        final StringBuffer sb = new StringBuffer("SeriesDBModel{");
         sb.append("id=").append(id);
         sb.append(", title='").append(title).append('\'');
         sb.append(", slug='").append(slug).append('\'');
-        sb.append(", mp3Url='").append(mp3Url).append('\'');
-        sb.append(", videoUrl='").append(videoUrl).append('\'');
-        sb.append(", speaker='").append(speaker).append('\'');
-        sb.append(", date=").append(date);
-        sb.append(", imageUrl='").append(imageUrl).append('\'');
-        sb.append(", slug='").append(slug).append('\'');
+        sb.append(", imageURL='").append(imageURL).append('\'');
         sb.append(", likes=").append(likes);
         sb.append(", shares=").append(shares);
         sb.append(", plays=").append(plays);
@@ -260,7 +202,7 @@ public class SermonDBModel  {
         sb.append(", createdDate=").append(createdDate);
         sb.append(", lastUpdatedBy='").append(lastUpdatedBy).append('\'');
         sb.append(", lastUpdatedDate=").append(lastUpdatedDate);
-        //sb.append(", series=").append(series.getId());
+        sb.append(", sermons=").append(sermons);
         sb.append('}');
         return sb.toString();
     }

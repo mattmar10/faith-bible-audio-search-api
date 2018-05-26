@@ -2,11 +2,15 @@ package com.mattmartin.faithbible.audiosearchapi.controllers;
 
 import com.google.common.collect.Iterables;
 import com.mattmartin.faithbible.audiosearchapi.config.FaithDateTimeFormatter;
+import com.mattmartin.faithbible.audiosearchapi.db.models.SeriesDBModel;
+import com.mattmartin.faithbible.audiosearchapi.db.models.SermonDBModel;
 import com.mattmartin.faithbible.audiosearchapi.dtos.Sermon;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonDocumentModel;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonMediaModel;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.StatsModel;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.services.ESSermonService;
+import com.mattmartin.faithbible.audiosearchapi.http.FBCApiResponse;
+import com.mattmartin.faithbible.audiosearchapi.services.SermonsService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -18,6 +22,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
@@ -32,12 +37,15 @@ public class SermonControllerTest {
     @Mock
     ESSermonService esSermonService;
 
+    @Mock
+    SermonsService sermonService;
+
     private SermonController sermonController;
 
     @Before
     public void setup(){
         initMocks(this);
-        sermonController = new SermonController(esSermonService);
+        sermonController = new SermonController(esSermonService, sermonService);
     }
 
     @Test
@@ -50,33 +58,42 @@ public class SermonControllerTest {
         final StatsModel statsModel = new StatsModel(20, 3, 7);
         Set<String> tags = new HashSet<>(Arrays.asList("tag1", "tag2"));
 
-        final SermonDocumentModel manual =
-                new SermonDocumentModel(
-                        "fakeId",
-                        "Exodus 20:12 How to Make Your Father's Day on Father's Day MH-FBC SunAM 6/21/2015",
-                        "http://edmondfaithbible.com/?page_id=2743&show&file_name=2015_0621%20Fathers%20Day%20Exodus%2020_12.mp3",
-                        "Dr Mark Hitchcock",
-                        FaithDateTimeFormatter.getLocalDate("2015-06-21"),
-                        "Father's Day",
-                        mediaModel,
-                        Optional.of("fathersDay123"),
-                        Optional.of(statsModel),
-                        Optional.of("https://s3.amazonaws.com/faith-bible-data/mp3-images/2014_0323+Revelation+3+1-6+The+Church+of+the+Walking+Dead.mp3.jpg"),
-                        Optional.of(tags));
+        final SeriesDBModel seriesDBModel = new SeriesDBModel();
+        seriesDBModel.setId(9);
+        seriesDBModel.setTitle("test");
+        seriesDBModel.setImageURL("http://edmondfaithbible.com/?page_id=2743&show&file_name=2015_0621%20Fathers%20Day%20Exodus%2020_12.mp3");
+        seriesDBModel.setSlug("slug");
+        seriesDBModel.setLikes(0);
+        seriesDBModel.setPlays(0);
+        seriesDBModel.setShares(0);
 
-        when(esSermonService.findById("fakeId")).thenReturn(Optional.of(manual));
+        SermonDBModel sermonDBModel = new SermonDBModel();
+        sermonDBModel.setId(7);
+        sermonDBModel.setTitle("Exodus 20:12 How to Make Your Father's Day on Father's Day MH-FBC SunAM 6/21/2015");
+        sermonDBModel.setSeries(seriesDBModel);
+        sermonDBModel.setSlug("slug");
+        sermonDBModel.setSpeaker("speaker");
+        sermonDBModel.setDate(LocalDate.now());
+        sermonDBModel.setImageUrl("http://edmondfaithbible.com/?page_id=2743&show&file_name=2015_0621%20Fathers%20Day%20Exodus%2020_12.mp3");
+        sermonDBModel.setLikes(0);
+        sermonDBModel.setPlays(0);
+        sermonDBModel.setShares(0);
+        seriesDBModel.setSermons(Arrays.asList(sermonDBModel));
 
-        ResponseEntity<Sermon> response = sermonController.findById("fakeId");
+
+        when(sermonService.findById(5)).thenReturn(Optional.of(sermonDBModel));
+
+        ResponseEntity<FBCApiResponse<Sermon>> response = sermonController.findById(5);
 
         assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
-        assertThat(response.getBody(), equalTo(Sermon.fromModel(manual)));
+        assertThat(response.getBody().getBody(), equalTo(Sermon.fromDBModel(sermonDBModel)));
     }
 
     @Test
     public void testShouldReturn404(){
-        when(esSermonService.findById("notFound")).thenReturn(Optional.empty());
+        when(esSermonService.findById(-1)).thenReturn(Optional.empty());
 
-        ResponseEntity<Sermon> response = sermonController.findById("notFound");
+        ResponseEntity<FBCApiResponse<Sermon>> response = sermonController.findById(8);
 
         assertThat(response.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
     }
@@ -98,28 +115,30 @@ public class SermonControllerTest {
 
         final SermonDocumentModel manual =
                 new SermonDocumentModel(
-                        "fakeId",
+                        5,
                         "Exodus 20:12 How to Make Your Father's Day on Father's Day MH-FBC SunAM 6/21/2015",
+                        "slug",
                         "http://edmondfaithbible.com/?page_id=2743&show&file_name=2015_0621%20Fathers%20Day%20Exodus%2020_12.mp3",
                         "Dr Mark Hitchcock",
                         FaithDateTimeFormatter.getLocalDate("2015-06-21"),
                         "Father's Day",
                         mediaModel,
-                        Optional.of("fathersDay123"),
+                        Optional.of(5),
                         Optional.of(statsModel),
                         Optional.of("https://s3.amazonaws.com/faith-bible-data/mp3-images/2014_0323+Revelation+3+1-6+The+Church+of+the+Walking+Dead.mp3.jpg"),
                         Optional.of(tags));
 
         final SermonDocumentModel manual2 =
                 new SermonDocumentModel(
-                        "fakeId2",
+                        7,
                         "Some title",
+                        "slug",
                         "http://dummyserver.com/some.mp3",
                         "Dr Mark Hitchcock",
                         FaithDateTimeFormatter.getLocalDate("2015-06-21"),
                         "Some Series",
                         mediaModel2,
-                        Optional.of("fathersDay123"),
+                        Optional.of(5),
                         Optional.of(statsModel2),
                         Optional.empty(),
                         Optional.of(tags2));

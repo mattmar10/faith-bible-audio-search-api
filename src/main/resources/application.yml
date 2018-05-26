@@ -7,7 +7,7 @@ spring:
     active: "local"
   jackson:
     serialization:
-      WRITE_DATES_AS_TIMESTAMPS: false
+      write_dates_as_timestamps: false
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     database: postgresql
@@ -27,9 +27,12 @@ spring:
         transport.tcp.connect_timeout: 120s
   datasource:
     platform: postgres
-    url: jdbc:postgresql://localhost:5432/fbc_media_data
+    url: jdbc:postgresql://fbc-media-pg-dev.cl77vpoxztkj.us-east-1.rds.amazonaws.com:5432/fbc_media_data
     username: fbc_svc_user
-    password: devpassword
+    password: cloudCAPTAIN
+    #url: jdbc:postgresql://localhost:5432/fbc_media_data
+    #username: fbc_svc_user
+    #password: devpassword
     driver-class-name: org.postgresql.Driver
 
 ---
@@ -38,12 +41,24 @@ spring:
   profiles: localDocker
   data:
     jest:
-      uri: http://host.docker.internal:9200
+      uri: https://vpc-fbc-audio-nmdhsw47abfn4qogfcts76w2r4.us-east-1.es.amazonaws.com
+  datasource:
+        platform: postgres
+        url: jdbc:postgresql://fbc-media-pg-dev.cl77vpoxztkj.us-east-1.rds.amazonaws.com:5432/fbc_media_data
+        username: fbc_svc_user
+        password: cloudCAPTAIN
+        driver-class-name: org.postgresql.Driver
 
 ---
 
 spring:
-  profiles: prod
+  profiles: dev
   data:
     jest:
-      uri: https://vpc-fbc-audio-nmdhsw47abfn4qogfcts76w2r4.us-east-1.es.amazonaws.com
+      uri: https://vpc-fbc-media-dev-to2lwbgdzuad2d5fbfgdh3ql6i.us-east-1.es.amazonaws.com
+  datasource:
+      platform: postgres
+      url: jdbc:postgresql://fbc-media-pg-dev.cl77vpoxztkj.us-east-1.rds.amazonaws.com:5432/fbc_media_data
+      username: fbc_svc_user
+      password: cloudCAPTAIN
+      driver-class-name: org.postgresql.Driver

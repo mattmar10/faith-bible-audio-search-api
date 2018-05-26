@@ -8,6 +8,7 @@ import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonMedia
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.StatsModel;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.services.ESSeriesService;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.services.ESSermonService;
+import com.mattmartin.faithbible.audiosearchapi.services.SeriesService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -36,6 +37,9 @@ public class SermonSearchControllerTest {
     @Mock
     ESSeriesService esSeriesService;
 
+    @Mock
+    SeriesService seriesService;
+
     private SermonSearchController sermonSearchController;
     private SermonDocumentModel fathersDayModel;
     private SermonDocumentModel fakeModel;
@@ -43,7 +47,7 @@ public class SermonSearchControllerTest {
     @Before
     public void setup(){
         initMocks(this);
-        sermonSearchController = new SermonSearchController(esSermonService, esSeriesService);
+        sermonSearchController = new SermonSearchController(esSermonService, esSeriesService, seriesService);
 
         final SermonMediaModel mediaModel =
                 new SermonMediaModel("http://edmondfaithbible.com/?page_id=2743&download&file_name=2015_0621%20Fathers%20Day%20MH-FBC%20SunAM.pdf",
@@ -61,28 +65,30 @@ public class SermonSearchControllerTest {
 
         fathersDayModel=
                 new SermonDocumentModel(
-                        "fakeId",
+                        5,
                         "Exodus 20:12 How to Make Your Father's Day on Father's Day MH-FBC SunAM 6/21/2015",
+                        "slug",
                         "http://edmondfaithbible.com/?page_id=2743&show&file_name=2015_0621%20Fathers%20Day%20Exodus%2020_12.mp3",
                         "Dr Mark Hitchcock",
                         FaithDateTimeFormatter.getLocalDate("2015-06-21"),
                         "Father's Day",
                         mediaModel,
-                        Optional.of("fathersDay123"),
+                        Optional.of(5),
                         Optional.of(statsModel),
                         Optional.of("https://s3.amazonaws.com/faith-bible-data/mp3-images/2014_0323+Revelation+3+1-6+The+Church+of+the+Walking+Dead.mp3.jpg"),
                         Optional.of(tags));
 
         fakeModel =
                 new SermonDocumentModel(
-                        "fakeId2",
+                        7,
                         "Some title",
+                        "slug",
                         "http://dummyserver.com/some.mp3",
                         "Dr Mark Hitchcock",
                         FaithDateTimeFormatter.getLocalDate("2015-06-21"),
                         "Some Series",
                         mediaModel2,
-                        Optional.of("fathersDay123"),
+                        Optional.of(5),
                         Optional.of(statsModel2),
                         Optional.empty(),
                         Optional.of(tags2));
