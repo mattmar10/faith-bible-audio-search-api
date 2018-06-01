@@ -15,6 +15,10 @@ spring:
         hibernate:
           default_schema: fbc_media
           dialect: com.mattmartin.faithbible.audiosearchapi.db.config.JSONPostgresSQLDialect
+  data:
+      jest:
+        #uri: https://vpc-fbc-audio-nmdhsw47abfn4qogfcts76w2r4.us-east-1.es.amazonaws.com
+        uri: http://media.faithbibleok.com:9200
 
 ---
 
@@ -27,9 +31,9 @@ spring:
         transport.tcp.connect_timeout: 120s
   datasource:
     platform: postgres
-    url: jdbc:postgresql://fbc-media-pg-dev.cl77vpoxztkj.us-east-1.rds.amazonaws.com:5432/fbc_media_data
-    username: fbc_svc_user
-    password: cloudCAPTAIN
+    url: jdbc:postgresql://media.faithbibleok.com:5432/mediadb
+    username: mediaDB
+    password: 600Faith
     #url: jdbc:postgresql://localhost:5432/fbc_media_data
     #username: fbc_svc_user
     #password: devpassword
@@ -41,7 +45,8 @@ spring:
   profiles: localDocker
   data:
     jest:
-      uri: https://vpc-fbc-audio-nmdhsw47abfn4qogfcts76w2r4.us-east-1.es.amazonaws.com
+      #uri: https://vpc-fbc-audio-nmdhsw47abfn4qogfcts76w2r4.us-east-1.es.amazonaws.com
+      uri: http://media.faithbibleok.com:9200
   datasource:
         platform: postgres
         url: jdbc:postgresql://fbc-media-pg-dev.cl77vpoxztkj.us-east-1.rds.amazonaws.com:5432/fbc_media_data
@@ -55,10 +60,11 @@ spring:
   profiles: dev
   data:
     jest:
-      uri: https://vpc-fbc-media-dev-to2lwbgdzuad2d5fbfgdh3ql6i.us-east-1.es.amazonaws.com
+      uri: http://media.faithbibleok.com:9200
+      #uri: https://vpc-fbc-media-dev-to2lwbgdzuad2d5fbfgdh3ql6i.us-east-1.es.amazonaws.com
   datasource:
       platform: postgres
-      url: jdbc:postgresql://fbc-media-pg-dev.cl77vpoxztkj.us-east-1.rds.amazonaws.com:5432/fbc_media_data
-      username: fbc_svc_user
-      password: cloudCAPTAIN
+      url: jdbc:postgresql://media.faithbibleok.com:5432/mediadb
+      username: mediaDB
+      password: 600Faith
       driver-class-name: org.postgresql.Driver
