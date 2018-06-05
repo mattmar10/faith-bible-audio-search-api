@@ -42,10 +42,35 @@ public class SermonControllerTest {
 
     private SermonController sermonController;
 
+    private SeriesDBModel seriesDBModel;
+    private SermonDBModel sermonDBModel;
+
     @Before
     public void setup(){
         initMocks(this);
         sermonController = new SermonController(esSermonService, sermonService);
+
+        seriesDBModel = new SeriesDBModel();
+        seriesDBModel.setId(5);
+        seriesDBModel.setTitle("test123");
+        seriesDBModel.setImageURL("http://edmondfaithbible.com/?page_id=2743&show&file_name=2015_0621%20Fathers%20Day%20Exodus%2020_12.mp3");
+        seriesDBModel.setSlug("slug");
+        seriesDBModel.setLikes(0);
+        seriesDBModel.setPlays(0);
+        seriesDBModel.setShares(0);
+
+        sermonDBModel = new SermonDBModel();
+        sermonDBModel.setId(7);
+        sermonDBModel.setTitle("Exodus 20:12 How to Make Your Father's Day on Father's Day MH-FBC SunAM 6/21/2015");
+        sermonDBModel.setSeries(seriesDBModel);
+        sermonDBModel.setSlug("slug");
+        sermonDBModel.setSpeaker("speaker");
+        sermonDBModel.setDate(LocalDate.now());
+        sermonDBModel.setImageUrl("http://edmondfaithbible.com/?page_id=2743&show&file_name=2015_0621%20Fathers%20Day%20Exodus%2020_12.mp3");
+        sermonDBModel.setLikes(0);
+        sermonDBModel.setPlays(0);
+        sermonDBModel.setShares(0);
+        seriesDBModel.setSermons(Arrays.asList(sermonDBModel));
     }
 
     @Test
@@ -155,5 +180,38 @@ public class SermonControllerTest {
         assertTrue(Iterables.contains(response.getBody(), Sermon.fromModel(manual)));
         assertTrue(Iterables.contains(response.getBody(), Sermon.fromModel(manual2)));
         assertThat(Iterables.size(response.getBody()), is(2));
+    }
+
+    @Test
+    public void testLikeCount(){
+
+        when(sermonService.findById(7)).thenReturn(Optional.of(sermonDBModel));
+        when(sermonService.save(sermonDBModel)).thenReturn(sermonDBModel);
+        ResponseEntity<FBCApiResponse<Sermon>> response = sermonController.incrementLikeCount(7);
+
+        assertThat(response.getBody().getBody().getStats().get().getLikes(), is(Optional.of(1)));
+
+    }
+
+    @Test
+    public void testPlayCount(){
+
+        when(sermonService.findById(7)).thenReturn(Optional.of(sermonDBModel));
+        when(sermonService.save(sermonDBModel)).thenReturn(sermonDBModel);
+        ResponseEntity<FBCApiResponse<Sermon>> response = sermonController.incrementPlayCount(7);
+
+        assertThat(response.getBody().getBody().getStats().get().getPlays(), is(Optional.of(1)));
+
+    }
+
+    @Test
+    public void testShareCount(){
+
+        when(sermonService.findById(7)).thenReturn(Optional.of(sermonDBModel));
+        when(sermonService.save(sermonDBModel)).thenReturn(sermonDBModel);
+        ResponseEntity<FBCApiResponse<Sermon>> response = sermonController.incrementShareCount(7);
+
+        assertThat(response.getBody().getBody().getStats().get().getShares(), is(Optional.of(1)));
+
     }
 }

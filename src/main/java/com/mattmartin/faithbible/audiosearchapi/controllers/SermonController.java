@@ -64,6 +64,91 @@ public class SermonController {
 
     @ResponseStatus(OK)
     @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not Found")
+    })
+    @RequestMapping(method = RequestMethod.PUT,
+            value = "/sermon/{id}/like",
+            produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<FBCApiResponse<Sermon>> incrementLikeCount(@PathVariable("id") Integer id){
+        final Optional<SermonDBModel> sermonMaybe = sermonsService.findById(id);
+
+        if(sermonMaybe.isPresent()){
+            final SermonDBModel sermonDBModel = sermonMaybe.get();
+            sermonDBModel.setLikes(sermonDBModel.getLikes() + 1);
+
+            final SermonDBModel saved = sermonsService.save(sermonDBModel);
+
+            final FBCApiResponse<Sermon> response =
+                    new FBCApiResponse<Sermon>(Sermon.fromDBModel(saved), HttpStatus.OK);
+
+            return new ResponseEntity<>(response, response.getStatusCode());
+        }
+
+        else{
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @ResponseStatus(OK)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not Found")
+    })
+    @RequestMapping(method = RequestMethod.PUT,
+            value = "/sermon/{id}/play",
+            produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<FBCApiResponse<Sermon>> incrementPlayCount(@PathVariable("id") Integer id){
+        final Optional<SermonDBModel> sermonMaybe = sermonsService.findById(id);
+
+        if(sermonMaybe.isPresent()){
+            final SermonDBModel sermonDBModel = sermonMaybe.get();
+            sermonDBModel.setPlays(sermonDBModel.getPlays() + 1);
+
+            final SermonDBModel saved = sermonsService.save(sermonDBModel);
+
+            final FBCApiResponse<Sermon> response =
+                    new FBCApiResponse<Sermon>(Sermon.fromDBModel(saved), HttpStatus.OK);
+
+            return new ResponseEntity<>(response, response.getStatusCode());
+        }
+
+        else{
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @ResponseStatus(OK)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not Found")
+    })
+    @RequestMapping(method = RequestMethod.PUT,
+            value = "/sermon/{id}/share",
+            produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<FBCApiResponse<Sermon>> incrementShareCount(@PathVariable("id") Integer id){
+        final Optional<SermonDBModel> sermonMaybe = sermonsService.findById(id);
+
+        if(sermonMaybe.isPresent()){
+            final SermonDBModel sermonDBModel = sermonMaybe.get();
+            sermonDBModel.setShares(sermonDBModel.getShares() + 1);
+
+            final SermonDBModel saved = sermonsService.save(sermonDBModel);
+
+            final FBCApiResponse<Sermon> response =
+                    new FBCApiResponse<Sermon>(Sermon.fromDBModel(saved), HttpStatus.OK);
+
+            return new ResponseEntity<>(response, response.getStatusCode());
+        }
+
+        else{
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+
+    @ResponseStatus(OK)
+    @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = String.class),
             @ApiResponse(code = 404, message = "Not Found", response = String.class),
             @ApiResponse(code = 503, message = "Service Unavailable")

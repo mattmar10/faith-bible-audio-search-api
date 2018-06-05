@@ -22,7 +22,7 @@ public class SermonsService {
         this.sermonRepository = repository;
     }
 
-    final SermonDBModel save(final SermonDBModel sermon){
+    public SermonDBModel save(final SermonDBModel sermon){
         logger.info(String.format("Persisting to db sermon: %s", sermon));
         return this.sermonRepository.save(sermon);
     }
