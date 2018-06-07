@@ -1,17 +1,42 @@
 package com.mattmartin.faithbible.audiosearchapi.elasticsearch.models;
 
 
+import com.mattmartin.faithbible.audiosearchapi.db.models.SermonDBModel;
 import com.mattmartin.faithbible.audiosearchapi.dtos.Stats;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
 
 @Document(indexName = "sermons")
 public class SermonDocumentModel {
+
+    public static SermonDocumentModel fromSermonDBModel(final SermonDBModel sermonDBModel){
+
+        final HashSet<String> tags =
+                sermonDBModel.getTags() == null ? new HashSet<>() : new HashSet(sermonDBModel.getTags());
+
+        final SermonDocumentModel doc =
+                new SermonDocumentModel(
+                        sermonDBModel.getId(),
+                        sermonDBModel.getTitle(),
+                        sermonDBModel.getSlug(),
+                        "",
+                        sermonDBModel.getSpeaker(),
+                        sermonDBModel.getDate(),
+                        sermonDBModel.getSeries().getTitle(),
+                        new SermonMediaModel(sermonDBModel.getPdfUrl(), sermonDBModel.getMp3Url()),
+                        Optional.of(sermonDBModel.getSeries().getId()),
+                        Optional.of( new StatsModel(sermonDBModel.getPlays(), sermonDBModel.getLikes(), sermonDBModel.getShares() )),
+                        Optional.ofNullable(sermonDBModel.getImageUrl()),
+                        Optional.of(tags));
+
+        return doc;
+    }
 
     @Id
     private Integer id;

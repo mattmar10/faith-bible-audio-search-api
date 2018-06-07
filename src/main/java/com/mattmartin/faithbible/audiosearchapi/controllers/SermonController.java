@@ -78,6 +78,7 @@ public class SermonController {
             sermonDBModel.setLikes(sermonDBModel.getLikes() + 1);
 
             final SermonDBModel saved = sermonsService.save(sermonDBModel);
+            searchService.save(SermonDocumentModel.fromSermonDBModel(saved));
 
             final FBCApiResponse<Sermon> response =
                     new FBCApiResponse<Sermon>(Sermon.fromDBModel(saved), HttpStatus.OK);
@@ -106,6 +107,7 @@ public class SermonController {
             sermonDBModel.setPlays(sermonDBModel.getPlays() + 1);
 
             final SermonDBModel saved = sermonsService.save(sermonDBModel);
+            searchService.save(SermonDocumentModel.fromSermonDBModel(saved));
 
             final FBCApiResponse<Sermon> response =
                     new FBCApiResponse<Sermon>(Sermon.fromDBModel(saved), HttpStatus.OK);
@@ -134,6 +136,7 @@ public class SermonController {
             sermonDBModel.setShares(sermonDBModel.getShares() + 1);
 
             final SermonDBModel saved = sermonsService.save(sermonDBModel);
+            searchService.save(SermonDocumentModel.fromSermonDBModel(saved));
 
             final FBCApiResponse<Sermon> response =
                     new FBCApiResponse<Sermon>(Sermon.fromDBModel(saved), HttpStatus.OK);
