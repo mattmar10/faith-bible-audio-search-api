@@ -80,6 +80,7 @@ public class ESSermonService{
                         .field("title")
                         .field("speaker")
                         .field("series")
+                        .field("tags")
                         .type(MultiMatchQueryBuilder.Type.BEST_FIELDS))
                 .withPageable(pageRequest)
                 .build();
