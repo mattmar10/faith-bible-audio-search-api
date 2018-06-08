@@ -31,6 +31,7 @@ public class SermonDocumentModel {
                         sermonDBModel.getSeries().getTitle(),
                         new SermonMediaModel(sermonDBModel.getPdfUrl(), sermonDBModel.getMp3Url()),
                         Optional.of(sermonDBModel.getSeries().getId()),
+                        Optional.of(sermonDBModel.getSeries().getSlug()),
                         Optional.of( new StatsModel(sermonDBModel.getPlays(), sermonDBModel.getLikes(), sermonDBModel.getShares() )),
                         Optional.ofNullable(sermonDBModel.getImageUrl()),
                         Optional.of(tags));

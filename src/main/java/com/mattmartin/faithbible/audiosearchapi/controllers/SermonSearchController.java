@@ -115,7 +115,7 @@ public class SermonSearchController {
 
     @ResponseStatus(OK)
     @RequestMapping(method = RequestMethod.POST, value = "/admin/indexData")
-    public void indexData(@RequestBody AudioJsonSource audioJsonSource){
+    public void indexData(){
 
         searchService.deleteAll();
         eseriesService.deleteAll();
