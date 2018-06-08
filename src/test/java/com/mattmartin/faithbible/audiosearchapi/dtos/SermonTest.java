@@ -38,6 +38,7 @@ public class SermonTest {
                         "Father's Day",
                         mediaModel,
                         Optional.of(5),
+                        Optional.of("seriesSLug"),
                         Optional.of(statsModel),
                         Optional.empty(),
                         Optional.of(tags));
@@ -50,6 +51,7 @@ public class SermonTest {
         assertThat(sermon.getDate(), is(manual.getDate()));
         assertThat(sermon.getSeries(), is(manual.getSeries()));
         assertThat(sermon.getSlug(), is(manual.getSlug()));
+        assertThat(sermon.getSeriesSlug(), is(manual.getSeriesSlug()));
         assertThat(sermon.getSpeaker(), is(manual.getSpeaker()));
         assertThat(sermon.getMp3URI(), is(Optional.of(URI.create(manual.getMedia().getMp3().get()))));
         assertThat(sermon.getPdfURI(), is(Optional.of(URI.create(manual.getMedia().getPdf().get()))));
@@ -80,6 +82,7 @@ public class SermonTest {
                         "Father's Day",
                         mediaModel,
                         Optional.of(5),
+                        Optional.of("seriesSlug"),
                         Optional.of(statsModel),
                         Optional.empty(),
                         Optional.of(tags));

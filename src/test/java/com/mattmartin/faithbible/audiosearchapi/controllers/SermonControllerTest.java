@@ -149,6 +149,7 @@ public class SermonControllerTest {
                         "Father's Day",
                         mediaModel,
                         Optional.of(5),
+                        Optional.of("seriesSlug"),
                         Optional.of(statsModel),
                         Optional.of("https://s3.amazonaws.com/faith-bible-data/mp3-images/2014_0323+Revelation+3+1-6+The+Church+of+the+Walking+Dead.mp3.jpg"),
                         Optional.of(tags));
@@ -164,6 +165,7 @@ public class SermonControllerTest {
                         "Some Series",
                         mediaModel2,
                         Optional.of(5),
+                        Optional.of("seriesSlug"),
                         Optional.of(statsModel2),
                         Optional.empty(),
                         Optional.of(tags2));

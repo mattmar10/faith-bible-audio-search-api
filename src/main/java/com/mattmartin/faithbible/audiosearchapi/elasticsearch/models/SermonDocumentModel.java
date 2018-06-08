@@ -24,7 +24,7 @@ public class SermonDocumentModel {
 
     private String series;
     private Optional<Integer> seriesId;
-
+    private Optional<String> seriesSlug;
     private Optional<String> image;
     private SermonMediaModel media;
     private Optional<StatsModel> stats;
@@ -41,6 +41,7 @@ public class SermonDocumentModel {
                                final String series,
                                final SermonMediaModel media,
                                final Optional<Integer> seriesId,
+                               final Optional<String> seriesSlug,
                                final Optional<StatsModel> stats,
                                final Optional<String> image,
                                final Optional<Set<String>> tags) {
@@ -54,6 +55,7 @@ public class SermonDocumentModel {
         this.media = media;
         this.image = image;
         this.seriesId = seriesId;
+        this.seriesSlug = seriesSlug;
         this.stats = stats;
         this.tags = tags;
     }
@@ -149,6 +151,14 @@ public class SermonDocumentModel {
         this.slug = slug;
     }
 
+    public Optional<String> getSeriesSlug() {
+        return seriesSlug;
+    }
+
+    public void setSeriesSlug(Optional<String> seriesSlug) {
+        this.seriesSlug = seriesSlug;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -175,6 +185,7 @@ public class SermonDocumentModel {
                 ", date=" + date +
                 ", series='" + series + '\'' +
                 ", seriesId='" + seriesId + '\'' +
+                ", seriesSlug='" + seriesSlug + '\'' +
                 ", slug='" + slug + '\'' +
                 ", media=" + media +
                 ", stats='" + stats + '\'' +

@@ -9,10 +9,13 @@ import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonDocum
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.StatsModel;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.services.ESSeriesService;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.services.ESSermonService;
+import com.mattmartin.faithbible.audiosearchapi.http.FBCApiResponse;
 import com.mattmartin.faithbible.audiosearchapi.services.SeriesService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -23,7 +26,9 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -40,6 +45,7 @@ public class SeriesControllerTest {
     SeriesService seriesService;
 
     private SeriesController seriesController;
+
 
     @Before
     public void setup(){
@@ -89,5 +95,25 @@ public class SeriesControllerTest {
 
         assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
         assertThat(response.getBody(), equalTo(new Series(seriesDBModel)));
+    }
+
+    @Test
+    public void testSearch(){
+
+        final SeriesModel series1 = mock(SeriesModel.class);
+        final SeriesModel series2 = mock(SeriesModel.class);
+
+        final PageImpl<SeriesModel> pageImpl =
+                new PageImpl<>(
+                        Arrays.asList(new SeriesModel[]{series1, series2}),
+                        PageRequest.of(0, 10), 1);
+
+        when(esSeriesService.findByFreeSearch(
+                "searchTerm",
+                PageRequest.of(0, 10))).thenReturn(pageImpl);
+
+        ResponseEntity<FBCApiResponse<Iterable<Series>>> response = seriesController.search("searchTerm", 0, 10);
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+
     }
 }
