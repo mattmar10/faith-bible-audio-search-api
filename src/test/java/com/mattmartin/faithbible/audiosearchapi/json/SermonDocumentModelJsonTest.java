@@ -58,6 +58,7 @@ public class SermonDocumentModelJsonTest {
                         "Father's Day",
                         mediaModel,
                         Optional.of(5),
+                        Optional.of("seriesSlug"),
                         Optional.of(statsModel),
                         Optional.empty(),
                         Optional.of(tags));

@@ -5,6 +5,7 @@ import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SeriesModel
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonDocumentModel;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.repositories.ESSeriesRepository;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.repositories.ESSermonRepository;
+import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.elasticsearch.index.query.QueryBuilders.multiMatchQuery;
 
 @Service
 public class ESSeriesService {
@@ -76,8 +78,6 @@ public class ESSeriesService {
 
             });
 
-
-
             if(seriesSet.size() >= count){
                 break;
             }
@@ -85,6 +85,21 @@ public class ESSeriesService {
 
         return seriesSet;
 
+    }
+
+    public Page<SeriesModel> findByFreeSearch(final String query, final PageRequest pageRequest) {
+
+        logger.info(String.format("Executing free form search for series with query [%s].", query));
+
+        final SearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(multiMatchQuery(query)
+                        .field("title")
+                        .field("tags")
+                        .type(MultiMatchQueryBuilder.Type.BEST_FIELDS))
+                .withPageable(pageRequest)
+                .build();
+
+        return esSeriesRepository.search(searchQuery);
     }
 
     private SeriesModel validateSeriesSermons(final SeriesModel seriesModel){

@@ -136,6 +136,7 @@ public class SermonSearchController {
                                     sermon.getSeries().getTitle(),
                                     new SermonMediaModel(sermon.getPdfUrl(), sermon.getMp3Url()),
                                     Optional.of(seriesDBModel.getId()),
+                                    Optional.of(seriesDBModel.getSlug()),
                                     Optional.of(new StatsModel(sermon.getPlays(), sermon.getLikes(), sermon.getShares())),
                                     Optional.ofNullable(sermon.getImageUrl()),
                                     sermon.getTags() == null ? Optional.empty() : Optional.of(new HashSet(sermon.getTags()))
@@ -320,6 +321,7 @@ public class SermonSearchController {
                                 sermon.getSeries().getTitle(),
                                 new SermonMediaModel(sermon.getPdfUrl(), sermon.getMp3Url()),
                                 Optional.of(series.getId()),
+                                Optional.of(series.getSlug()),
                                 Optional.of(new StatsModel(0, 0, 0)),
                                 Optional.ofNullable(sermon.getImageUrl()),
                                 Optional.of(new HashSet<>())

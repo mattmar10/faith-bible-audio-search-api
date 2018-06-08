@@ -2,7 +2,9 @@ package com.mattmartin.faithbible.audiosearchapi.controllers;
 
 import com.mattmartin.faithbible.audiosearchapi.db.models.SeriesDBModel;
 import com.mattmartin.faithbible.audiosearchapi.dtos.Series;
+import com.mattmartin.faithbible.audiosearchapi.dtos.Sermon;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SeriesModel;
+import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonDocumentModel;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.services.ESSeriesService;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.services.ESSermonService;
 import com.mattmartin.faithbible.audiosearchapi.http.FBCApiResponse;
@@ -12,6 +14,9 @@ import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -62,6 +67,27 @@ public class SeriesController {
         else{
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @ResponseStatus(OK)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 400, message = "BAD REQUEST")
+    })
+    @RequestMapping(method = RequestMethod.GET,
+            value = "/series/search",
+            produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<FBCApiResponse<Iterable<Series>>> search(@RequestParam("q") String query,
+                                                   @RequestParam int page,
+                                                   @RequestParam int size){
+
+        final Page<SeriesModel> found =
+                seriesESService.findByFreeSearch(query, PageRequest.of(page, size));
+
+        final Iterable<Series> mapped = found.map(seriesModel -> new Series(seriesModel));
+        final FBCApiResponse<Iterable<Series>> response = new FBCApiResponse<>(mapped, HttpStatus.OK);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @ResponseStatus(OK)

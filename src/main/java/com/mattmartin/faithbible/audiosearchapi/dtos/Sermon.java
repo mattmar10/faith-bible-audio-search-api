@@ -23,6 +23,7 @@ public class Sermon {
     private LocalDate date;
 
     private Optional<String> seriesLink;
+    private Optional<String> seriesSlug;
     private Optional<URI> mp3URI;
     private Optional<URI> imageURI;
     private Optional<URI> pdfURI;
@@ -42,6 +43,7 @@ public class Sermon {
         final Optional<URI> imageURI = documentModel.getImage().map(URI::create);
         final Optional<URI> pdfURI = documentModel.getMedia().getPdf().map(URI::create);
         final Optional<String> seriesLink = documentModel.getSeriesId().map(id -> "/series/" + id);
+        final Optional<String> seriesSlug = documentModel.getSeriesSlug();
 
         final Optional<Stats> stats =
                 documentModel.getStats().map(
@@ -49,7 +51,7 @@ public class Sermon {
 
         final Optional<Set<String>> tags = documentModel.getTags();
 
-        return new Sermon(docId, title, slug, speaker, series, seriesLink, date, mp3URI, imageURI, pdfURI, stats, tags);
+        return new Sermon(docId, title, slug, speaker, series, seriesLink, seriesSlug, date, mp3URI, imageURI, pdfURI, stats, tags);
 
     }
 
@@ -59,6 +61,7 @@ public class Sermon {
         final String slug = sermonDBModel.getSlug();
         final String speaker = sermonDBModel.getSpeaker();
         final String series = sermonDBModel.getSeries().getTitle();
+        final String seriesSlug = sermonDBModel.getSeries().getSlug();
         final LocalDate date = sermonDBModel.getDate();
         final String seriesLink = "/series/" + sermonDBModel.getSeries().getId();
 
@@ -73,7 +76,7 @@ public class Sermon {
 
         final Optional<Set<String>> tagSet = tags.map(list -> new HashSet(list));
 
-        return new Sermon(id, title, slug, speaker, series, Optional.of(seriesLink), date, mp3URI, imageURI, pdfURI, Optional.of(stats), tagSet);
+        return new Sermon(id, title, slug, speaker, series, Optional.of(seriesLink), Optional.of(seriesSlug), date, mp3URI, imageURI, pdfURI, Optional.of(stats), tagSet);
     }
 
     private Sermon( final Integer id,
@@ -82,6 +85,7 @@ public class Sermon {
                    final String speaker,
                    final String series,
                    final Optional<String> seriesLink,
+                   final Optional<String> seriesSlug,
                    final LocalDate date,
                    final Optional<URI> mp3URI,
                    final Optional<URI> imageURI,
@@ -95,6 +99,7 @@ public class Sermon {
         this.speaker = speaker;
         this.series = series;
         this.seriesLink = seriesLink;
+        this.seriesSlug = seriesSlug;
         this.date = date;
         this.mp3URI = mp3URI;
         this.imageURI = imageURI;
@@ -201,6 +206,14 @@ public class Sermon {
         this.slug = slug;
     }
 
+    public Optional<String> getSeriesSlug() {
+        return seriesSlug;
+    }
+
+    public void setSeriesSlug(Optional<String> seriesSlug) {
+        this.seriesSlug = seriesSlug;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -238,6 +251,8 @@ public class Sermon {
         sb.append(", title='").append(title).append('\'');
         sb.append(", speaker='").append(speaker).append('\'');
         sb.append(", series='").append(series).append('\'');
+        sb.append(", seriesLink='").append(seriesLink).append('\'');
+        sb.append(", seriesSlug='").append(seriesSlug).append('\'');
         sb.append(", slug='").append(slug).append('\'');
         sb.append(", date=").append(date);
         sb.append(", mp3URI=").append(mp3URI);
