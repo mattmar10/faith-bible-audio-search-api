@@ -66,6 +66,17 @@ public class ESSermonService{
         return eSSermonRepository.search(query);
     }
 
+    public Page<SermonDocumentModel> findBySeriesId(final int seriesId, final PageRequest pageRequest) {
+        logger.info(String.format("Searching for sermons by seriesId [%s].", seriesId));
+
+        final SearchQuery query = new NativeSearchQueryBuilder()
+                .withQuery(matchQuery("seriesId", seriesId))
+                .withPageable(pageRequest)
+                .build();
+
+        return eSSermonRepository.search(query);
+    }
+
     public Optional<SermonDocumentModel>findById(final Integer id){
         logger.info(String.format("Fetching details for sermon [%s].", id));
         return eSSermonRepository.findById(id);

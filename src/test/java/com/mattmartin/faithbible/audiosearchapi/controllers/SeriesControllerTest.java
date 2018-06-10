@@ -4,6 +4,7 @@ import com.mattmartin.faithbible.audiosearchapi.config.FaithDateTimeFormatter;
 import com.mattmartin.faithbible.audiosearchapi.db.models.SeriesDBModel;
 import com.mattmartin.faithbible.audiosearchapi.db.models.SermonDBModel;
 import com.mattmartin.faithbible.audiosearchapi.dtos.Series;
+import com.mattmartin.faithbible.audiosearchapi.dtos.Sermon;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SeriesModel;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonDocumentModel;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.StatsModel;
@@ -103,10 +104,23 @@ public class SeriesControllerTest {
         final SeriesModel series1 = mock(SeriesModel.class);
         final SeriesModel series2 = mock(SeriesModel.class);
 
+        final SermonDocumentModel sermonDocumentModel = mock(SermonDocumentModel.class);
+
         final PageImpl<SeriesModel> pageImpl =
                 new PageImpl<>(
                         Arrays.asList(new SeriesModel[]{series1, series2}),
                         PageRequest.of(0, 10), 1);
+
+        final PageImpl<SermonDocumentModel> pageImpl2 =
+                new PageImpl<>(
+                        Arrays.asList(new SermonDocumentModel[]{sermonDocumentModel}),
+                        PageRequest.of(0, 10), 1);
+
+        when(series1.getId()).thenReturn(1);
+        when(series2.getId()).thenReturn(2);
+
+        when(esSermonService.findBySeriesId(1, PageRequest.of(0, 500))).thenReturn(pageImpl2);
+        when(esSermonService.findBySeriesId(2, PageRequest.of(0, 500))).thenReturn(pageImpl2);
 
         when(esSeriesService.findByFreeSearch(
                 "searchTerm",

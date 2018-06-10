@@ -2,7 +2,6 @@ package com.mattmartin.faithbible.audiosearchapi.controllers;
 
 import com.mattmartin.faithbible.audiosearchapi.db.models.SeriesDBModel;
 import com.mattmartin.faithbible.audiosearchapi.dtos.Series;
-import com.mattmartin.faithbible.audiosearchapi.dtos.Sermon;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SeriesModel;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonDocumentModel;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.services.ESSeriesService;
@@ -16,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +34,7 @@ public class SeriesController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final ESSermonService searchService;
+    private final ESSermonService sermonESService;
     private final ESSeriesService seriesESService;
     private final SeriesService seriesService;
 
@@ -44,7 +42,7 @@ public class SeriesController {
     public SeriesController(final ESSermonService sService,
                             final ESSeriesService esSeriesService,
                             final SeriesService seriesService){
-        this.searchService = sService;
+        this.sermonESService = sService;
         this.seriesESService = esSeriesService;
         this.seriesService = seriesService;
     }
@@ -84,7 +82,15 @@ public class SeriesController {
         final Page<SeriesModel> found =
                 seriesESService.findByFreeSearch(query, PageRequest.of(page, size));
 
-        final Iterable<Series> mapped = found.map(seriesModel -> new Series(seriesModel));
+        final Iterable<Series> mapped = found.map(seriesModel -> {
+
+            final Page<SermonDocumentModel> sermons =
+                    sermonESService.findBySeriesId(seriesModel.getId(), PageRequest.of(0, 500));
+
+            seriesModel.setSermons(sermons.getContent());
+
+            return new Series(seriesModel);
+        });
         final FBCApiResponse<Iterable<Series>> response = new FBCApiResponse<>(mapped, HttpStatus.OK);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
