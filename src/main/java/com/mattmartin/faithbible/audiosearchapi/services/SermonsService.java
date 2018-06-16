@@ -1,6 +1,5 @@
 package com.mattmartin.faithbible.audiosearchapi.services;
 
-import com.mattmartin.faithbible.audiosearchapi.db.models.SeriesDBModel;
 import com.mattmartin.faithbible.audiosearchapi.db.models.SermonDBModel;
 import com.mattmartin.faithbible.audiosearchapi.db.repositories.SermonRepository;
 import org.slf4j.Logger;
@@ -8,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -32,7 +30,8 @@ public class SermonsService {
         return this.sermonRepository.findById(sermonId);
     }
 
-    final List<SermonDBModel> getBySeries(final SeriesDBModel seriesDBModel) {
-        return this.sermonRepository.findBySeries(seriesDBModel);
-    };
+    public Optional<SermonDBModel> findBySlug(final String slug){
+        logger.info(String.format("Fetching sermon from db with slug: %s", slug));
+        return this.sermonRepository.findBySlug(slug);
+    }
 }

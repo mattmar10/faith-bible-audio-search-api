@@ -190,7 +190,7 @@ public class SermonControllerTest {
         when(sermonService.findById(7)).thenReturn(Optional.of(sermonDBModel));
         when(sermonService.save(sermonDBModel)).thenReturn(sermonDBModel);
         ResponseEntity<FBCApiResponse<Sermon>> response = sermonController.incrementLikeCount(7);
-
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
         assertThat(response.getBody().getBody().getStats().get().getLikes(), is(Optional.of(1)));
 
     }
@@ -201,7 +201,7 @@ public class SermonControllerTest {
         when(sermonService.findById(7)).thenReturn(Optional.of(sermonDBModel));
         when(sermonService.save(sermonDBModel)).thenReturn(sermonDBModel);
         ResponseEntity<FBCApiResponse<Sermon>> response = sermonController.incrementPlayCount(7);
-
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
         assertThat(response.getBody().getBody().getStats().get().getPlays(), is(Optional.of(1)));
 
     }
@@ -213,7 +213,16 @@ public class SermonControllerTest {
         when(sermonService.save(sermonDBModel)).thenReturn(sermonDBModel);
         ResponseEntity<FBCApiResponse<Sermon>> response = sermonController.incrementShareCount(7);
 
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
         assertThat(response.getBody().getBody().getStats().get().getShares(), is(Optional.of(1)));
 
+    }
+
+    @Test
+    public void testFindBySlug(){
+        when(sermonService.findBySlug("slug")).thenReturn(Optional.of(sermonDBModel));
+        ResponseEntity<FBCApiResponse<Sermon>> response = sermonController.findBySlug("slug");
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+        assertThat(response.getBody().getBody(), is(Sermon.fromDBModel(sermonDBModel)));
     }
 }

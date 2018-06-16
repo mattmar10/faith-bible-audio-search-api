@@ -1,6 +1,8 @@
 package com.mattmartin.faithbible.audiosearchapi.controllers;
 
+import com.mattmartin.faithbible.audiosearchapi.db.models.SeriesDBModel;
 import com.mattmartin.faithbible.audiosearchapi.db.models.SermonDBModel;
+import com.mattmartin.faithbible.audiosearchapi.dtos.Series;
 import com.mattmartin.faithbible.audiosearchapi.dtos.Sermon;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonDocumentModel;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.services.ESSermonService;
@@ -149,6 +151,26 @@ public class SermonController {
         }
     }
 
+
+    @ResponseStatus(OK)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not Found")
+    })
+    @RequestMapping(method = RequestMethod.GET,
+            value = "/sermon/slug/{slug}",
+            produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<FBCApiResponse<Sermon>> findBySlug(@PathVariable("slug") String slug){
+        final Optional<SermonDBModel> sermonDBModelMaybe = sermonsService.findBySlug(slug);
+
+        if(sermonDBModelMaybe.isPresent()){
+            final Sermon sermon = Sermon.fromDBModel(sermonDBModelMaybe.get());
+            return new ResponseEntity<>(new FBCApiResponse<>(sermon, HttpStatus.OK), HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 
     @ResponseStatus(OK)
     @ApiResponses(value = {
