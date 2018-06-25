@@ -1,6 +1,7 @@
 package com.mattmartin.faithbible.audiosearchapi.controllers;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import com.mattmartin.faithbible.audiosearchapi.config.FaithDateTimeFormatter;
 import com.mattmartin.faithbible.audiosearchapi.db.models.SeriesDBModel;
 import com.mattmartin.faithbible.audiosearchapi.db.models.SermonDBModel;
@@ -23,12 +24,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -58,6 +57,7 @@ public class SermonControllerTest {
         seriesDBModel.setLikes(0);
         seriesDBModel.setPlays(0);
         seriesDBModel.setShares(0);
+        seriesDBModel.setMapped(false);
 
         sermonDBModel = new SermonDBModel();
         sermonDBModel.setId(7);
@@ -224,5 +224,16 @@ public class SermonControllerTest {
         ResponseEntity<FBCApiResponse<Sermon>> response = sermonController.findBySlug("slug");
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
         assertThat(response.getBody().getBody(), is(Sermon.fromDBModel(sermonDBModel)));
+    }
+
+    @Test
+    public void testGetAllSermons(){
+        final Set<SermonDBModel> sermonDBModelList = Sets.newHashSet(sermonDBModel);
+
+        when(sermonService.getAllSermons()).thenReturn(sermonDBModelList);
+        FBCApiResponse<Set<Sermon>> response = sermonController.getAllSermons();
+        verify(sermonService).getAllSermons();
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+        assertThat(response.getBody(), equalTo(Sets.newHashSet(Sermon.fromDBModel(sermonDBModel))));
     }
 }

@@ -18,8 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.OK;
@@ -185,7 +184,6 @@ public class SermonController {
 
         final Page<SermonDocumentModel> sdms = searchService.findMostRecent(count);
 
-
         if(sdms.getTotalElements() == 0){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -197,6 +195,24 @@ public class SermonController {
             return new ResponseEntity<>(found, HttpStatus.OK);
         }
 
+    }
+
+    @ResponseStatus(OK)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = String.class),
+            @ApiResponse(code = 503, message = "Service Unavailable")
+    })
+    @RequestMapping(method = RequestMethod.GET, value = "/sermons", produces = APPLICATION_JSON_VALUE)
+    public FBCApiResponse<Set<Sermon>> getAllSermons(){
+
+        final Iterable<SermonDBModel> found = sermonsService.getAllSermons();
+        final Set<Sermon> mapped = new HashSet<>();
+
+        found.forEach(s -> {
+            mapped.add(Sermon.fromDBModel(s));
+        });
+
+        return new FBCApiResponse<>(mapped, HttpStatus.OK);
     }
 
 

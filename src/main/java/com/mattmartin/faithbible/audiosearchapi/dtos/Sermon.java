@@ -237,7 +237,11 @@ public class Sermon {
         result = 31 * result + title.hashCode();
         result = 31 * result + speaker.hashCode();
         result = 31 * result + series.hashCode();
-        result = 31 * result + date.hashCode();
+
+        if(date != null){
+            result = 31 * result + date.hashCode();
+        }
+
         result = 31 * result + mp3URI.hashCode();
         result = 31 * result + pdfURI.hashCode();
         result = 31 * result + imageURI.hashCode();

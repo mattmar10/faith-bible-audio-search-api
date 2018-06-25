@@ -29,6 +29,9 @@ spring:
       properties:
         path.home: target/elastic
         transport.tcp.connect_timeout: 120s
+    #jest:
+      #uri: https://vpc-fbc-audio-nmdhsw47abfn4qogfcts76w2r4.us-east-1.es.amazonaws.com
+      #uri: http://media.faithbibleok.com:9200
   datasource:
     platform: postgres
     url: jdbc:postgresql://media.faithbibleok.com:5432/mediadb

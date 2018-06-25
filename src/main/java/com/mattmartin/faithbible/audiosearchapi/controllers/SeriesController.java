@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.CREATED;
@@ -193,6 +194,21 @@ public class SeriesController {
         final Series series = new Series(persisted);
 
         return new ResponseEntity<>(series, HttpStatus.OK);
+    }
+
+    @ResponseStatus(OK)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = String.class),
+            @ApiResponse(code = 503, message = "Service Unavailable")
+    })
+    @RequestMapping(method = RequestMethod.GET,
+            value = "/series",
+            produces = APPLICATION_JSON_VALUE)
+    public FBCApiResponse<Set<Series>> getAllSeries() {
+        final List<SeriesDBModel> found = seriesService.getAll();
+        final Set<Series> mapped = found.stream().map(s -> new Series(s)).collect(Collectors.toSet());
+
+        return  new FBCApiResponse<>(mapped, HttpStatus.OK);
     }
 
 

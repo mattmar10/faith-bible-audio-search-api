@@ -236,7 +236,6 @@ public class SermonDBModel  {
         result = 31 * result + speaker.hashCode();
         result = 31 * result + date.hashCode();
         result = 31 * result + (imageUrl != null ? imageUrl.hashCode() : 0);
-        result = 31 * result + series.hashCode();
         return result;
     }
 
