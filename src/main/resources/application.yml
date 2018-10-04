@@ -30,13 +30,13 @@ spring:
         path.home: target/elastic
         transport.tcp.connect_timeout: 120s
     #jest:
-      #uri: https://vpc-fbc-audio-nmdhsw47abfn4qogfcts76w2r4.us-east-1.es.amazonaws.com
+     # uri: https://vpc-fbc-media-es-37epjmhn7jvydo7gt2g2d7pjrm.us-east-1.es.amazonaws.com
       #uri: http://media.faithbibleok.com:9200
   datasource:
     platform: postgres
-    url: jdbc:postgresql://media.faithbibleok.com:5432/mediadb
-    username: mediaDB
-    password: 600Faith
+    url: jdbc:postgresql://fbc-media-db-dev.csljeq5nxpsl.us-east-1.rds.amazonaws.com/fbc_media_db
+    username: fbcsvcuser
+    password: cloudCAPTAIN
     #url: jdbc:postgresql://localhost:5432/fbc_media_data
     #username: fbc_svc_user
     #password: devpassword
@@ -63,7 +63,7 @@ spring:
   profiles: dev
   data:
     jest:
-      uri: http://media.faithbibleok.com:9200
+      uri: https://vpc-fbc-media-es-37epjmhn7jvydo7gt2g2d7pjrm.us-east-1.es.amazonaws.com
       #uri: https://vpc-fbc-media-dev-to2lwbgdzuad2d5fbfgdh3ql6i.us-east-1.es.amazonaws.com
   datasource:
       platform: postgres
