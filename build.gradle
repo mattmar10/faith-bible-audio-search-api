@@ -1,6 +1,6 @@
 buildscript {
 	ext {
-		springBootVersion = '2.0.1.RELEASE'
+		springBootVersion = '2.0.5.RELEASE'
 	}
 	repositories {
 		mavenCentral()
@@ -62,6 +62,7 @@ dependencies {
     compile("org.flywaydb:flyway-core:5.0.7")
     compile("commons-net:commons-net:3.3")
     compile("com.mpatric:mp3agic:0.9.1")
+    compile("commons-lang:commons-lang:2.6")
     compile("javax.xml.bind:jaxb-api:2.3.0")
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 

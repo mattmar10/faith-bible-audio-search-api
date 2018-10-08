@@ -34,28 +34,10 @@ spring:
       #uri: http://media.faithbibleok.com:9200
   datasource:
     platform: postgres
-    url: jdbc:postgresql://fbc-media-db-dev.csljeq5nxpsl.us-east-1.rds.amazonaws.com/fbc_media_db
+    url: jdbc:postgresql://0.0.0.0:5432/fbc_media_db
     username: fbcsvcuser
-    password: cloudCAPTAIN
-    #url: jdbc:postgresql://localhost:5432/fbc_media_data
-    #username: fbc_svc_user
-    #password: devpassword
+    password: devpassword
     driver-class-name: org.postgresql.Driver
-
----
-
-spring:
-  profiles: localDocker
-  data:
-    jest:
-      #uri: https://vpc-fbc-audio-nmdhsw47abfn4qogfcts76w2r4.us-east-1.es.amazonaws.com
-      uri: http://media.faithbibleok.com:9200
-  datasource:
-        platform: postgres
-        url: jdbc:postgresql://fbc-media-pg-dev.cl77vpoxztkj.us-east-1.rds.amazonaws.com:5432/fbc_media_data
-        username: fbc_svc_user
-        password: cloudCAPTAIN
-        driver-class-name: org.postgresql.Driver
 
 ---
 
@@ -63,11 +45,10 @@ spring:
   profiles: dev
   data:
     jest:
-      uri: https://vpc-fbc-media-es-37epjmhn7jvydo7gt2g2d7pjrm.us-east-1.es.amazonaws.com
+      uri: https://https://vpc-fbc-media-es-37epjmhn7jvydo7gt2g2d7pjrm.us-east-1.es.amazonaws.com
       #uri: https://vpc-fbc-media-dev-to2lwbgdzuad2d5fbfgdh3ql6i.us-east-1.es.amazonaws.com
   datasource:
       platform: postgres
-      url: jdbc:postgresql://media.faithbibleok.com:5432/mediadb
-      username: mediaDB
-      password: 600Faith
+      url: jdbc:postgresql://fbc-media-db-dev.csljeq5nxpsl.us-east-1.rds.amazonaws.com/fbc_media_db
+
       driver-class-name: org.postgresql.Driver
