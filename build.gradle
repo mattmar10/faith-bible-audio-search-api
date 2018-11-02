@@ -46,6 +46,12 @@ repositories {
 	mavenCentral()
 }
 
+dependencyManagement {
+    imports {
+        mavenBom 'com.amazonaws:aws-java-sdk-bom:1.11.228'
+    }
+}
+
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-hateoas'){
         exclude module: "spring-boot-starter-logging"
@@ -64,6 +70,7 @@ dependencies {
     compile("com.mpatric:mp3agic:0.9.1")
     compile("commons-lang:commons-lang:2.6")
     compile("javax.xml.bind:jaxb-api:2.3.0")
+    compile 'com.amazonaws:aws-java-sdk-s3'
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 
     runtime('org.postgresql:postgresql')
@@ -107,4 +114,8 @@ configurations {
 
 
 
+}
+compileJava {
+    options.fork = true
+    options.forkOptions.executable = project.property('javacPath')
 }

@@ -3,20 +3,24 @@ package com.mattmartin.faithbible.audiosearchapi.dtos;
 public class MP3File {
 
     private final String name;
-    private final String path;
+    private final String url;
+    private final String s3Key;
 
-    public MP3File(final String name, final String path) {
+    public MP3File(final String name, final String url, final String s3Key) {
         this.name = name;
-        this.path = path;
+        this.url = url;
+        this.s3Key = s3Key;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getPath() {
-        return path;
+    public String getUrl() {
+        return url;
     }
+
+    public String getS3Key() { return s3Key; };
 
 
     @Override
@@ -27,13 +31,16 @@ public class MP3File {
         MP3File mp3File = (MP3File) o;
 
         if (!name.equals(mp3File.name)) return false;
-        return path.equals(mp3File.path);
+        if (!s3Key.equals(mp3File.s3Key)) return false;
+
+        return url.equals(mp3File.url);
     }
 
     @Override
     public int hashCode() {
         int result = name.hashCode();
-        result = 31 * result + path.hashCode();
+        result = 31 * result + url.hashCode();
+        result = 31 * result + s3Key.hashCode();
         return result;
     }
 
@@ -42,7 +49,8 @@ public class MP3File {
     public String toString() {
         final StringBuffer sb = new StringBuffer("MP3File{");
         sb.append("name='").append(name).append('\'');
-        sb.append(", path='").append(path).append('\'');
+        sb.append(", url='").append(url).append('\'');
+        sb.append(", s3Key='").append(s3Key).append('\'');
         sb.append('}');
         return sb.toString();
     }
