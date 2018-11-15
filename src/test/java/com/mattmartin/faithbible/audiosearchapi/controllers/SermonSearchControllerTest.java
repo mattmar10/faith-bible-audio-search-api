@@ -8,6 +8,7 @@ import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonMedia
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.StatsModel;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.services.ESSeriesService;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.services.ESSermonService;
+import com.mattmartin.faithbible.audiosearchapi.services.S3Service;
 import com.mattmartin.faithbible.audiosearchapi.services.SeriesService;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,6 +41,9 @@ public class SermonSearchControllerTest {
     @Mock
     SeriesService seriesService;
 
+    @Mock
+    S3Service s3Service;
+
     private SermonSearchController sermonSearchController;
     private SermonDocumentModel fathersDayModel;
     private SermonDocumentModel fakeModel;
@@ -47,7 +51,7 @@ public class SermonSearchControllerTest {
     @Before
     public void setup(){
         initMocks(this);
-        sermonSearchController = new SermonSearchController(esSermonService, esSeriesService, seriesService);
+        sermonSearchController = new SermonSearchController(esSermonService, esSeriesService, seriesService, s3Service);
 
         final SermonMediaModel mediaModel =
                 new SermonMediaModel("http://edmondfaithbible.com/?page_id=2743&download&file_name=2015_0621%20Fathers%20Day%20MH-FBC%20SunAM.pdf",

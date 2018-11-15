@@ -1,11 +1,13 @@
 package com.mattmartin.faithbible.audiosearchapi.controllers;
 
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.mattmartin.faithbible.audiosearchapi.db.models.SeriesDBModel;
 import com.mattmartin.faithbible.audiosearchapi.db.models.SermonDBModel;
 import com.mattmartin.faithbible.audiosearchapi.dtos.Sermon;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.*;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.services.ESSeriesService;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.services.ESSermonService;
+import com.mattmartin.faithbible.audiosearchapi.services.S3Service;
 import com.mattmartin.faithbible.audiosearchapi.services.SeriesService;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -41,14 +43,17 @@ public class SermonSearchController {
     private final ESSermonService searchService;
     private final ESSeriesService eseriesService;
     private final SeriesService seriesService;
+    private final S3Service s3service;
 
     @Autowired
     public SermonSearchController(final ESSermonService sService,
                                   final ESSeriesService eSeriesService,
-                                  final SeriesService seriesService){
+                                  final SeriesService seriesService,
+                                  final S3Service s3Service) {
         this.searchService = sService;
         this.eseriesService = eSeriesService;
         this.seriesService = seriesService;
+        this.s3service = s3Service;
     }
 
     @ResponseStatus(OK)
@@ -181,33 +186,41 @@ public class SermonSearchController {
 
         Map<String, SeriesModel> seriesMap = new HashMap<>();
 
-        int seriesCounter = 1;
         int sermonCounter = 1;
 
         for (final SermonDocumentModel sermon: response.getBody()) {
             sermon.setId(sermonCounter++);
+
+            final Optional<String> mp3Part = sermon.getMedia().getMp3().map(str -> str.substring(str.lastIndexOf("=") + 1));
+            final Optional<String> pdfPart = sermon.getMedia().getPdf().map(str -> str.substring(str.lastIndexOf("=") + 1));
+
+            final Optional<String> newMp3 = mp3Part.flatMap(
+                    name -> s3service.getUnmappedMP3(name).map(s3ObjectSummary -> s3service.getURL(s3ObjectSummary)));
+
+            final Optional<String> newPdf = pdfPart.flatMap(
+                    name -> s3service.getUnmappedPDF(name).map(s3ObjectSummary -> s3service.getURL(s3ObjectSummary)));
+
+            if(newMp3.isPresent()){
+                sermon.getMedia().setMp3(newMp3.get());
+            }
+            if(newPdf.isPresent()) {
+                sermon.getMedia().setPdf(newPdf.get());
+            }
 
             if(sermon.getTitle().contains("(")){
                 sermon.setTitle(sermon.getTitle().substring(0, sermon.getTitle().lastIndexOf("(") - 1).trim());
             }
 
             sermon.getImage().ifPresent(s -> {
+                final String imgName = s.substring(s.lastIndexOf("/") + 1);
+                final Optional<String> s3Path = s3service.findImageURL(imgName);
+                //String encoded = convertToURLEscapingIllegalCharacters(s);
 
-                String encoded = convertToURLEscapingIllegalCharacters(s);
-
-                sermon.setImage(Optional.ofNullable(encoded));
+                sermon.setImage(s3Path);
             });
-
-
 
             try{
                 final String seriesId = getMD5(sermon.getSeries());
-
-               // final String id = getMD5(sermon.getTitle());
-               // sermon.setId(id);
-                //sermon.setSeriesId(Optional.of(seriesId));
-                //searchService.save(sermon);
-
                 final Optional<URI> imageURI = sermon.getImage().map(s -> URI.create(s));
                 final StatsModel stats = new StatsModel(0, 0, 0);
 
@@ -235,7 +248,7 @@ public class SermonSearchController {
                 logger.error("Unable to persist sermon", e);
             }
 
-        };
+        }
 
         final List<SeriesDBModel> seriesDBModels = new ArrayList<>();
 
@@ -326,7 +339,7 @@ public class SermonSearchController {
                                 Optional.ofNullable(sermon.getImageUrl()),
                                 Optional.of(new HashSet<>())
                                 );
-                searchService.save(documentModel);
+                //searchService.save(documentModel);
 
             });
             final Optional<URI> imageURI = (series.getImageURL()) == null ? Optional.empty() : Optional.of(URI.create(series.getImageURL()));

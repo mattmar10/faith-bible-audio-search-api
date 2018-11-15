@@ -4,6 +4,7 @@ import com.mattmartin.faithbible.audiosearchapi.dtos.MP3File;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -15,12 +16,8 @@ import static org.mockito.Mockito.when;
 
 public class S3ServiceTest {
 
-    private S3Service s3Service;
-
-    @Before
-    public void setUp() {
-        this.s3Service = mock(S3Service.class);
-    }
+    @Mock
+    private S3Service s3Service = mock(S3Service.class);
 
     @Test
     public void testS3Connect(){
