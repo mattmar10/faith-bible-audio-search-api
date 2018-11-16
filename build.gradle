@@ -58,7 +58,7 @@ dependencies {
         exclude module: "logback-classic"
     }
     compile('org.springframework.boot:spring-boot-starter-log4j2')
-	compile('com.github.vanroy:spring-boot-starter-data-jest:3.1.2.RELEASE')
+	compile('com.github.vanroy:spring-boot-starter-data-jest:3.1.5.RELEASE')
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
     compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.6" // for serialization of LocalDateTime in Java 8
     compile('io.springfox:springfox-swagger2:2.8.0')
@@ -115,7 +115,7 @@ configurations {
 
 
 }
-compileJava {
-    options.fork = true
-    options.forkOptions.executable = project.property('javacPath')
-}
+//compileJava {
+//    options.fork = true
+//    options.forkOptions.executable = project.property('javacPath')
+//}

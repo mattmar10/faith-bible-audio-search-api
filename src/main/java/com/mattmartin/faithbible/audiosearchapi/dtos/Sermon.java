@@ -79,6 +79,8 @@ public class Sermon {
         return new Sermon(id, title, slug, speaker, series, Optional.of(seriesLink), Optional.of(seriesSlug), date, mp3URI, imageURI, pdfURI, Optional.of(stats), tagSet);
     }
 
+    public Sermon(){}
+
     private Sermon( final Integer id,
                    final String title,
                    final String slug,

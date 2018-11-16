@@ -8,6 +8,8 @@ public class Stats {
     private Optional<Integer> likes;
     private Optional<Integer> shares;
 
+    public Stats(){}
+
     public Stats(final int playCount, final int likesCount, final int shareCount){
         plays = Optional.ofNullable(playCount);
         likes = Optional.ofNullable(likesCount);

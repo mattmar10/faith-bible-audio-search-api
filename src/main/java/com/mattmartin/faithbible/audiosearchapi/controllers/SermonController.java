@@ -150,6 +150,30 @@ public class SermonController {
         }
     }
 
+    @ResponseStatus(OK)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not Found")
+    })
+    @RequestMapping(method = RequestMethod.PATCH,
+            value = "/sermon/{id}",
+            produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<FBCApiResponse<Sermon>> update(@PathVariable("id") int id,
+                                                         @RequestBody Sermon sermon){
+
+        final Optional<SermonDBModel> toUpdate = sermonsService.findById(id);
+
+        if(toUpdate.isPresent()){
+            final Optional<SermonDBModel> sermonDBModelMaybe =
+                    sermonsService.updateSermon(toUpdate.get(), sermon);
+            final Sermon updated = Sermon.fromDBModel(sermonDBModelMaybe.get());
+            return new ResponseEntity<>(new FBCApiResponse<>(updated, HttpStatus.OK), HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
 
     @ResponseStatus(OK)
     @ApiResponses(value = {

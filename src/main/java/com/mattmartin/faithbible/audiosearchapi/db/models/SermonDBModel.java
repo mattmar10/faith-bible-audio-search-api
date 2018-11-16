@@ -3,9 +3,12 @@ package com.mattmartin.faithbible.audiosearchapi.db.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mattmartin.faithbible.audiosearchapi.dtos.Sermon;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import com.mattmartin.faithbible.audiosearchapi.db.config.StringListJsonUserType;
+import org.springframework.util.CollectionUtils;
+
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
@@ -64,7 +67,6 @@ public class SermonDBModel  {
     @ManyToOne
     @JoinColumn(name="series_id", nullable = false)
     private SeriesDBModel series;
-
 
     public SermonDBModel(){}
 
@@ -210,6 +212,61 @@ public class SermonDBModel  {
 
     public void setSlug(String slug) {
         this.slug = slug;
+    }
+
+    public SermonDBModel updateFromOtherSermonDBModel(final SermonDBModel other){
+
+        if(other.getTitle() != null){
+            this.title = other.getTitle();
+        }
+
+        if (other.getMp3Url() != null) {
+            this.mp3Url = other.getMp3Url();
+        }
+
+        if (other.getSpeaker() != null) {
+            this.speaker = other.getSpeaker();
+        }
+
+        if(other.getDate() != null){
+            this.date = other.getDate();
+        }
+
+        if(other.getImageUrl() != null){
+            this.imageUrl = other.getImageUrl();
+        }
+
+        if(other.getLikes() != null){
+            this.likes = other.getLikes();
+        }
+
+        if(other.getShares() != null){
+            this.shares = other.getShares();
+        }
+
+        if(other.getPlays() != null){
+            this.plays = other.getPlays();
+        }
+
+        if(other.getTags() != null && other.getTags().size() > 0){
+            this.tags = other.getTags();
+        }
+
+        if(other.getSeries() != null){
+            this.series = other.getSeries();
+        }
+
+        if(other.getPdfUrl() != null){
+            this.pdfUrl = other.getPdfUrl();
+        }
+
+        if(other.getSlug() != null){
+            this.slug = other.getSlug();
+        }
+
+        this.setLastUpdatedDate(LocalDate.now());
+
+        return this;
     }
 
     @Override

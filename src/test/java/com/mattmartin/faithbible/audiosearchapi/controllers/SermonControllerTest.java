@@ -115,11 +115,35 @@ public class SermonControllerTest {
     }
 
     @Test
+    public void testUpdate(){
+        SermonDBModel sermonDBMod = new SermonDBModel();
+
+        sermonDBMod.setId(7);
+        sermonDBMod.setTitle("Exodus 20:12 How to Your Father's Day on Father's Day MH-FBC SunAM 6/21/2015");
+        sermonDBMod.setSeries(seriesDBModel);
+        sermonDBMod.setSlug("slug0");
+        sermonDBMod.setSpeaker("speakerA");
+        sermonDBMod.setDate(LocalDate.now());
+        sermonDBMod.setImageUrl("http://edmondfaithbible.com/?page_id=2743&show&file_name=2015_0621%20Fathers%20Day%20Exodus%2020_12.mp3");
+        sermonDBMod.setLikes(4);
+        sermonDBMod.setPlays(3);
+        sermonDBMod.setShares(2);
+        seriesDBModel.setSermons(Arrays.asList(sermonDBMod));
+
+        when(sermonService.findById(7)).thenReturn(Optional.of(sermonDBMod));
+        when(sermonService.findById(5)).thenReturn(Optional.of(sermonDBModel));
+        when(sermonService.updateSermon(sermonDBModel, Sermon.fromDBModel(sermonDBMod))).thenReturn(Optional.of(sermonDBMod));
+
+        ResponseEntity<FBCApiResponse<Sermon>> response = sermonController.update(5, Sermon.fromDBModel(sermonDBMod));
+        assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
+
+    }
+
+    @Test
     public void testShouldReturn404(){
         when(esSermonService.findById(-1)).thenReturn(Optional.empty());
 
         ResponseEntity<FBCApiResponse<Sermon>> response = sermonController.findById(8);
-
         assertThat(response.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
     }
 
