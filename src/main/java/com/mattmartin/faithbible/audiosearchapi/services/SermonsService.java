@@ -65,6 +65,7 @@ public class SermonsService {
         });
 
         sermon.getTags().ifPresent(tags -> sermonDBModel.setTags(new ArrayList<>(tags)));
+        sermon.getSanitized().ifPresent(sanitized -> sermonDBModel.setMapped(sanitized));
         return sermonDBModel;
     }
 

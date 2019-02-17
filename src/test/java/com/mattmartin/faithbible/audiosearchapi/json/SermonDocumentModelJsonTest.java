@@ -8,6 +8,8 @@ import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonMedia
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.StatsModel;
 import org.junit.Test;
 
+import javax.swing.text.html.Option;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -31,6 +33,7 @@ public class SermonDocumentModelJsonTest {
                 "        \"date\": \"2015-06-21T00:00:00\",\n" +
                 "        \"series\": \"Father's Day\",\n" +
                 "        \"stats\": {\"plays\": 3, \"likes\": 5, \"shares\": 7},\n" +
+                "        \"sanitized\": true,\n" +
                 "        \"tags\": [\"Fathers Day\", \"Exodus\"],\n" +
                 "        \"media\": {\n" +
                 "            \"pdf\": \"http://edmondfaithbible.com/?page_id=2743&download&file_name=2015_0621%20Fathers%20Day%20MH-FBC%20SunAM.pdf\",\n" +
@@ -40,6 +43,7 @@ public class SermonDocumentModelJsonTest {
 
         final ObjectMapper mapper = new JacksonConfiguration().objectMapper();
         final SermonDocumentModel parsed = mapper.readValue(json, SermonDocumentModel.class);
+
 
         final SermonMediaModel mediaModel =
                 new SermonMediaModel("http://edmondfaithbible.com/?page_id=2743&download&file_name=2015_0621%20Fathers%20Day%20MH-FBC%20SunAM.pdf",
@@ -61,7 +65,8 @@ public class SermonDocumentModelJsonTest {
                         Optional.of("seriesSlug"),
                         Optional.of(statsModel),
                         Optional.empty(),
-                        Optional.of(tags));
+                        Optional.of(tags),
+                        Optional.of(true));
 
         assertThat(parsed, equalTo(manual));
         assertThat(parsed.hashCode(), equalTo(manual.hashCode()));
@@ -73,5 +78,6 @@ public class SermonDocumentModelJsonTest {
         assertThat(stats.getLikes().get(), is(5));
         assertThat(stats.getShares().get(), is(7));
 
+        assertThat(parsed.getSanitized(), is(Optional.of(true)));
     }
 }

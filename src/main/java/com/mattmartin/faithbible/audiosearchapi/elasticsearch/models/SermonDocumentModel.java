@@ -3,6 +3,7 @@ package com.mattmartin.faithbible.audiosearchapi.elasticsearch.models;
 
 import com.mattmartin.faithbible.audiosearchapi.db.models.SermonDBModel;
 import com.mattmartin.faithbible.audiosearchapi.dtos.Stats;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
@@ -34,7 +35,8 @@ public class SermonDocumentModel {
                         Optional.of(sermonDBModel.getSeries().getSlug()),
                         Optional.of( new StatsModel(sermonDBModel.getPlays(), sermonDBModel.getLikes(), sermonDBModel.getShares() )),
                         Optional.ofNullable(sermonDBModel.getImageUrl()),
-                        Optional.of(tags));
+                        Optional.of(tags),
+                        Optional.ofNullable(sermonDBModel.getMapped()));
 
         return doc;
     }
@@ -55,6 +57,7 @@ public class SermonDocumentModel {
     private SermonMediaModel media;
     private Optional<StatsModel> stats;
     private Optional<Set<String>> tags;
+    private Optional<Boolean> sanitized;
 
     public SermonDocumentModel(){}
 
@@ -70,7 +73,8 @@ public class SermonDocumentModel {
                                final Optional<String> seriesSlug,
                                final Optional<StatsModel> stats,
                                final Optional<String> image,
-                               final Optional<Set<String>> tags) {
+                               final Optional<Set<String>> tags,
+                               final Optional<Boolean> sanitized) {
         this.id = id;
         this.title = title;
         this.slug = slug;
@@ -84,6 +88,7 @@ public class SermonDocumentModel {
         this.seriesSlug = seriesSlug;
         this.stats = stats;
         this.tags = tags;
+        this.sanitized = sanitized;
     }
 
     public Integer getId() {
@@ -183,6 +188,12 @@ public class SermonDocumentModel {
 
     public void setSeriesSlug(Optional<String> seriesSlug) {
         this.seriesSlug = seriesSlug;
+    }
+
+    public Optional<Boolean> getSanitized() { return this.sanitized; }
+
+    public void setSanitized(final Optional<Boolean> sanitized){
+        this.sanitized = sanitized;
     }
 
     @Override

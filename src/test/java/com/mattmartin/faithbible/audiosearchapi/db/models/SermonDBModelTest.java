@@ -33,6 +33,7 @@ public class SermonDBModelTest {
         sermonDBModel.setLikes(0);
         sermonDBModel.setPlays(0);
         sermonDBModel.setShares(0);
+        sermonDBModel.setMapped(false);
 
         SermonDBModel sermonDBModel2 = new SermonDBModel();
         sermonDBModel2.setId(7);
@@ -46,9 +47,11 @@ public class SermonDBModelTest {
         sermonDBModel2.setLikes(5);
         sermonDBModel2.setPlays(6);
         sermonDBModel2.setShares(7);
+        sermonDBModel2.setMapped(true);
 
         final SermonDBModel updated = sermonDBModel.updateFromOtherSermonDBModel(sermonDBModel2);
 
         assertThat(updated, equalTo(sermonDBModel2));
+        assertThat(sermonDBModel2.getMapped(), equalTo(true));
     }
 }

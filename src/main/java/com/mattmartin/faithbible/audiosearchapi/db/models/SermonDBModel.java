@@ -264,6 +264,7 @@ public class SermonDBModel  {
             this.slug = other.getSlug();
         }
 
+        this.mapped = other.getMapped();
         this.setLastUpdatedDate(LocalDate.now());
 
         return this;

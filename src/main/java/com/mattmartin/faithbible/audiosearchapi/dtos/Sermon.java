@@ -29,6 +29,7 @@ public class Sermon {
     private Optional<URI> pdfURI;
     private Optional<Stats> stats;
     private Optional<Set<String>> tags;
+    private Optional<Boolean> sanitized;
 
     public static Sermon fromModel(final SermonDocumentModel documentModel) throws IllegalStateException{
         final Integer docId = documentModel.getId();
@@ -51,7 +52,9 @@ public class Sermon {
 
         final Optional<Set<String>> tags = documentModel.getTags();
 
-        return new Sermon(docId, title, slug, speaker, series, seriesLink, seriesSlug, date, mp3URI, imageURI, pdfURI, stats, tags);
+        final Optional<Boolean> sanitized = documentModel.getSanitized();
+
+        return new Sermon(docId, title, slug, speaker, series, seriesLink, seriesSlug, date, mp3URI, imageURI, pdfURI, stats, tags, sanitized);
 
     }
 
@@ -73,10 +76,11 @@ public class Sermon {
         final Stats stats = new Stats(sermonDBModel.getPlays(), sermonDBModel.getLikes(), sermonDBModel.getShares());
 
         final Optional<List<String>> tags = Optional.ofNullable(sermonDBModel.getTags());
-
         final Optional<Set<String>> tagSet = tags.map(list -> new HashSet(list));
 
-        return new Sermon(id, title, slug, speaker, series, Optional.of(seriesLink), Optional.of(seriesSlug), date, mp3URI, imageURI, pdfURI, Optional.of(stats), tagSet);
+        final Optional<Boolean> sanitized = Optional.ofNullable(sermonDBModel.getMapped());
+
+        return new Sermon(id, title, slug, speaker, series, Optional.of(seriesLink), Optional.of(seriesSlug), date, mp3URI, imageURI, pdfURI, Optional.of(stats), tagSet, sanitized);
     }
 
     public Sermon(){}
@@ -93,7 +97,9 @@ public class Sermon {
                    final Optional<URI> imageURI,
                    final Optional<URI> pdfURI,
                    final Optional<Stats> stats,
-                    final Optional<Set<String>> tags) {
+                    final Optional<Set<String>> tags,
+                    final Optional<Boolean> sanitized) {
+
 
         this.id = id;
         this.title = title;
@@ -108,6 +114,7 @@ public class Sermon {
         this.pdfURI = pdfURI;
         this.stats = stats;
         this.tags = tags;
+        this.sanitized = sanitized;
     }
 
     public Integer getId(){
@@ -216,6 +223,12 @@ public class Sermon {
         this.seriesSlug = seriesSlug;
     }
 
+    public Optional<Boolean> getSanitized() { return sanitized; }
+
+    public void setSanitized(final Optional<Boolean> sanitized){
+        this.sanitized = sanitized;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -266,6 +279,7 @@ public class Sermon {
         sb.append(", imageURI=").append(imageURI);
         sb.append(", stats=").append(stats);
         sb.append(", tags=").append(tags);
+        sb.append(", sanitized=").append(sanitized);
         sb.append('}');
         return sb.toString();
     }

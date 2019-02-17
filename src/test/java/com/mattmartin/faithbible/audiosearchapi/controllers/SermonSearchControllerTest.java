@@ -81,7 +81,8 @@ public class SermonSearchControllerTest {
                         Optional.of("seriesSlug"),
                         Optional.of(statsModel),
                         Optional.of("https://s3.amazonaws.com/faith-bible-data/mp3-images/2014_0323+Revelation+3+1-6+The+Church+of+the+Walking+Dead.mp3.jpg"),
-                        Optional.of(tags));
+                        Optional.of(tags),
+                        Optional.of(false));
 
         fakeModel =
                 new SermonDocumentModel(
@@ -97,7 +98,8 @@ public class SermonSearchControllerTest {
                         Optional.of("seriesSlug2"),
                         Optional.of(statsModel2),
                         Optional.empty(),
-                        Optional.of(tags2));
+                        Optional.of(tags2),
+                        Optional.of(false));
     }
 
     @Test

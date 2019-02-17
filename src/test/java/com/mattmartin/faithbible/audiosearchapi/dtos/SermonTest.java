@@ -1,12 +1,18 @@
 package com.mattmartin.faithbible.audiosearchapi.dtos;
 
 import com.mattmartin.faithbible.audiosearchapi.config.FaithDateTimeFormatter;
+import com.mattmartin.faithbible.audiosearchapi.db.models.SeriesDBModel;
+import com.mattmartin.faithbible.audiosearchapi.db.models.SermonDBModel;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonDocumentModel;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.SermonMediaModel;
 import com.mattmartin.faithbible.audiosearchapi.elasticsearch.models.StatsModel;
 import org.junit.Test;
 
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
@@ -41,7 +47,8 @@ public class SermonTest {
                         Optional.of("seriesSLug"),
                         Optional.of(statsModel),
                         Optional.empty(),
-                        Optional.of(tags));
+                        Optional.of(tags),
+                        Optional.of(true));
 
         final Sermon sermon = Sermon.fromModel(manual);
         final Optional<Stats> stats = sermon.getStats();
@@ -59,6 +66,54 @@ public class SermonTest {
         assertThat(stats.get().getLikes(), is(statsModel.getLikes()));
         assertThat(stats.get().getPlays(), is(statsModel.getPlays()));
         assertThat(stats.get().getShares(), is(statsModel.getShares()));
+        assertThat(sermon.getSanitized(), equalTo(manual.getSanitized()));
+    }
+
+    @Test
+    public void testFromDBModel() throws URISyntaxException {
+        final SeriesDBModel seriesDBModel = new SeriesDBModel();
+        seriesDBModel.setId(9);
+        seriesDBModel.setTitle("test");
+        seriesDBModel.setImageURL("http://edmondfaithbible.com/?page_id=2743&show&file_name=2015_0621%20Fathers%20Day%20Exodus%2020_12.mp3");
+        seriesDBModel.setSlug("slug");
+        seriesDBModel.setLikes(0);
+        seriesDBModel.setPlays(0);
+        seriesDBModel.setShares(0);
+
+        final SermonDBModel sermonDBModel = new SermonDBModel();
+        sermonDBModel.setId(7);
+        sermonDBModel.setTitle("Exodus 20:12 How to Make Your Father's Day on Father's Day MH-FBC SunAM 6/21/2015");
+        sermonDBModel.setSeries(seriesDBModel);
+        sermonDBModel.setSlug("slug");
+        sermonDBModel.setSpeaker("speaker");
+        sermonDBModel.setDate(LocalDate.now());
+        sermonDBModel.setPdfUrl("http://pdf.pdf");
+        sermonDBModel.setMp3Url("http://somethinghere.mp3");
+        sermonDBModel.setImageUrl("http://edmondfaithbible.com/?page_id=2743&show&file_name=2015_0621%20Fathers%20Day%20Exodus%2020_12.mp3");
+        sermonDBModel.setLikes(0);
+        sermonDBModel.setPlays(0);
+        sermonDBModel.setShares(0);
+        sermonDBModel.setMapped(false);
+
+        final Sermon fromDB = Sermon.fromDBModel(sermonDBModel);
+
+        assertThat(fromDB.getId(), equalTo(sermonDBModel.getId()));
+        assertThat(fromDB.getTitle(), equalTo(sermonDBModel.getTitle()));
+        assertThat(fromDB.getSanitized(), equalTo(Optional.of(sermonDBModel.getMapped())));
+        assertThat(fromDB.getSeries(), equalTo(seriesDBModel.getTitle()));
+        assertThat(fromDB.getSlug(), equalTo(sermonDBModel.getSlug()));
+
+        assertThat(fromDB.getMp3URI(), equalTo(Optional.of(new URI(sermonDBModel.getMp3Url()))));
+        assertThat(fromDB.getImageURI(), equalTo(Optional.of(new URI(sermonDBModel.getImageUrl()))));
+        assertThat(fromDB.getPdfURI(), equalTo(Optional.of(new URI(sermonDBModel.getPdfUrl()))));
+
+        final Stats stats = fromDB.getStats().get();
+        assertThat(stats.getLikes().get(), equalTo(sermonDBModel.getLikes()));
+        assertThat(stats.getPlays().get(), equalTo(sermonDBModel.getPlays()));
+        assertThat(stats.getShares().get(), equalTo(sermonDBModel.getShares()));
+
+
+
     }
 
     @Test
@@ -85,7 +140,8 @@ public class SermonTest {
                         Optional.of("seriesSlug"),
                         Optional.of(statsModel),
                         Optional.empty(),
-                        Optional.of(tags));
+                        Optional.of(tags),
+                        Optional.of(true));
 
         final Sermon sermon =  Sermon.fromModel(manual);
         final Sermon sermon2 = Sermon.fromModel(manual);

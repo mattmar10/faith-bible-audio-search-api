@@ -144,7 +144,8 @@ public class SermonSearchController {
                                     Optional.of(seriesDBModel.getSlug()),
                                     Optional.of(new StatsModel(sermon.getPlays(), sermon.getLikes(), sermon.getShares())),
                                     Optional.ofNullable(sermon.getImageUrl()),
-                                    sermon.getTags() == null ? Optional.empty() : Optional.of(new HashSet(sermon.getTags()))
+                                    sermon.getTags() == null ? Optional.empty() : Optional.of(new HashSet(sermon.getTags())),
+                                    Optional.of(sermon.getMapped())
                             );
 
                     searchService.save(documentModel);
@@ -337,8 +338,8 @@ public class SermonSearchController {
                                 Optional.of(series.getSlug()),
                                 Optional.of(new StatsModel(0, 0, 0)),
                                 Optional.ofNullable(sermon.getImageUrl()),
-                                Optional.of(new HashSet<>())
-                                );
+                                Optional.of(new HashSet<>()),
+                                Optional.of(sermon.getMapped()));
                 //searchService.save(documentModel);
 
             });
